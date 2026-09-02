@@ -13,6 +13,8 @@ $xcpc-experience-coach 把这段赛后复盘整理成投稿草稿
 
 也可以自然语言提问；当请求涉及协会 XCPC 经验时，Skill 可被自动触发。
 
+完整的 Codex、用户级安装及其他 Agent 用法见 [使用指南](docs/usage.md)。
+
 ## 投稿
 
 1. 阅读 [投稿 Schema](.agents/skills/xcpc-experience-coach/references/contribution-schema.md)。
