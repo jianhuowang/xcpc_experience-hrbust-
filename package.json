@@ -1,0 +1,8 @@
+{
+  "name": "xcpc-experience-hrbust",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "validate": "node scripts/validate.mjs"
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "HRBUST XCPC 经验助手"
+  short_description: "检索、引用并整理协会 XCPC 算法、比赛与训练经验投稿"
+  default_prompt: "Use $xcpc-experience-coach to answer from reviewed association experience with sources."
