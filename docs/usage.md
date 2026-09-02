@@ -70,6 +70,19 @@ gh skill install jianhuowang/xcpc_experience-hrbust- .agents/skills/xcpc-experie
 
 运行 `gh skill install --help` 可以查看当前 GitHub CLI 支持的其他 Agent。不同 Agent 的自动触发和工具能力可能不同；知识检索、来源引用和投稿整理仍由同一个 `SKILL.md` 约束。
 
+### DeepSeek Harness（DSH）
+
+DSH 原生扫描项目根目录的 `.agents/skills/`，因此克隆本仓库并以它作为 DSH 工作区后，无需额外安装。可在 Web GUI、TUI 或 ACP 前端中显式调用：
+
+```text
+/xcpc-experience-coach 查询协会关于最短路调试的经验
+/xcpc-experience-coach 我正在盲做，只给我 H1 提示
+```
+
+DSH 同时支持用户级 `~/.agents/skills/`。若希望在所有 DSH 项目中使用，可把 `xcpc-experience-coach` 整个目录复制到该位置。
+
+当前 GitHub CLI 的 `gh skill install --agent` 列表尚未包含 `dsh`，不要使用不存在的 `--agent dsh`；仓库级自动发现或手动复制即可。
+
 ## 投稿
 
 1. 从 `main` 创建分支。
