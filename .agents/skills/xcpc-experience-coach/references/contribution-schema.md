@@ -23,7 +23,7 @@ related: 20260820-bob-dijkstra-debugging
 - `status`：`active / deprecated`
 - `topics`、`authors` 可用英文逗号分隔多项
 - `authors` 至少包含一位投稿者，并使用 GitHub `@用户名`
-- 审核人与合并人不写入条目，以 GitHub PR review 和 merge history 为准
+- 审核人与合并人不写入条目；GitHub PR approvals、CODEOWNERS 和 merge history 是唯一审核审计来源
 - `related` 可省略或填写逗号分隔的稳定条目 ID
 
 ## 公共正文

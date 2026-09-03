@@ -72,7 +72,7 @@ function validateFile(path) {
   if (!list(fields.topics ?? "").length) errors.push("topics 至少包含一项");
 
   const authors = list(fields.authors ?? "");
-  if (authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 必须使用 GitHub @用户名");
+  if (!authors.length || authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 必须使用 GitHub @用户名");
 
   for (const id of list(fields.related ?? "")) {
     if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+$/.test(id)) errors.push(`related 条目 ID 非法：${id}`);

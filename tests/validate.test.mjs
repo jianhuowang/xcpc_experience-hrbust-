@@ -82,6 +82,12 @@ test("rejects missing authors", () => {
   assert.match(result.stderr, /缺少字段：authors/);
 });
 
+test("rejects an empty author list", () => {
+  const result = validate(entry({ authors: "," }));
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /authors 必须使用 GitHub @用户名/);
+});
+
 test("rejects the legacy reviewers field", () => {
   const content = entry().replace(
     'authors: "@alice"\n',
