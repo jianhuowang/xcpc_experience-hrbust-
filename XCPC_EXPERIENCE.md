@@ -2,6 +2,8 @@
 
 > 这是由协会知识仓库生成的单文件版本，适合上传给普通网页 Chat 使用。知识源：https://github.com/jianhuowang/xcpc_experience-hrbust-
 
+最新版下载：https://raw.githubusercontent.com/jianhuowang/xcpc_experience-hrbust-/main/XCPC_EXPERIENCE.md
+
 ## 使用者怎么用
 
 1. 把整个文件上传到当前聊天；如果模型能读取公开 URL，也可以直接发送本文件的 GitHub Raw 地址。

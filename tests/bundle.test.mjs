@@ -30,6 +30,7 @@ test("bundles only active entries and produces stable output", () => {
     assert.equal(firstRun.status, 0, firstRun.stderr || firstRun.stdout);
     const first = readFileSync(fixture.output, "utf8");
     assert.match(first, /只把标记为 active 的条目作为协会经验/);
+    assert.match(first, /raw\.githubusercontent\.com\/jianhuowang\/xcpc_experience-hrbust-\/main\/XCPC_EXPERIENCE\.md/);
     assert.match(first, /20260903-alice-active-entry/);
     assert.match(first, /应保留的经验/);
     assert.doesNotMatch(first, /不应出现的旧经验/);

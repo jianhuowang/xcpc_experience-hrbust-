@@ -4,6 +4,7 @@ import { basename, join, resolve } from "node:path";
 const knowledgeRoot = resolve(process.argv[2] ?? ".agents/skills/xcpc-experience-coach/references/knowledge");
 const outputPath = resolve(process.argv[3] ?? "XCPC_EXPERIENCE.md");
 const repository = "https://github.com/jianhuowang/xcpc_experience-hrbust-";
+const rawBundle = "https://raw.githubusercontent.com/jianhuowang/xcpc_experience-hrbust-/main/XCPC_EXPERIENCE.md";
 
 const entries = readdirSync(knowledgeRoot)
   .filter((name) => name.endsWith(".md"))
@@ -33,6 +34,8 @@ ${content}
 const output = `# HRBUST XCPC 经验知识包
 
 > 这是由协会知识仓库生成的单文件版本，适合上传给普通网页 Chat 使用。知识源：${repository}
+
+最新版下载：${rawBundle}
 
 ## 使用者怎么用
 
