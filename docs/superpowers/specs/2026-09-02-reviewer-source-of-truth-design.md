@@ -16,12 +16,12 @@
 1. 投稿者不再填写或猜测审核人。
 2. 校验器接受没有 `reviewers` 的条目。
 3. 新条目出现 `reviewers` 时按未知字段拒绝，促使投稿使用新 Schema。
-4. 当前三个示例条目移除 `reviewers`。
+4. 当前 5 条知识条目均完成迁移，其中 3 个 `deprecated` 示例移除 `reviewers`。
 5. 投稿 Schema、使用指南和 PR 模板明确说明审核记录由 GitHub 承载。
 
 ## 迁移
 
-仓库目前有 5 条知识（2 条 `active`、3 条 `deprecated` 示例），只需迁移三个 deprecated 示例。尚未合并的投稿分支若包含 `reviewers`，应删除该字段后重新运行校验。
+仓库目前有 5 条知识（2 条 `active`、3 条 `deprecated` 示例），任务期间新增的 2 条 `active` 与原有 3 条 `deprecated` 均完成迁移。尚未合并的投稿分支若包含 `reviewers`，应删除该字段后重新运行校验。
 
 ## 验证
 

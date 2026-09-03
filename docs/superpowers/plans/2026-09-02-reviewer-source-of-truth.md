@@ -4,7 +4,7 @@
 
 **Goal:** 删除知识条目中的 `reviewers` 字段，把 GitHub PR 审批与合并历史确立为唯一审核记录。
 
-**Architecture:** Frontmatter 只保存内容本身需要携带的作者和证据元数据；治理审计留在 GitHub。校验器拒绝遗留 `reviewers` 字段，三个示例与投稿文档同步迁移，不增加机器人或回填流程。
+**Architecture:** Frontmatter 只保存内容本身需要携带的作者和证据元数据；治理审计留在 GitHub。校验器拒绝遗留 `reviewers` 字段，5 条知识（2 条 `active`、3 条 `deprecated`）与投稿文档同步迁移，不增加机器人或回填流程。
 
 **Tech Stack:** Markdown、Node.js 22 标准库、`node:test`、GitHub Pull Request/CODEOWNERS。
 
@@ -26,6 +26,8 @@
 - Modify: `.agents/skills/xcpc-experience-coach/references/knowledge/20260902-example-member-contest-switching.md`
 - Modify: `.agents/skills/xcpc-experience-coach/references/knowledge/20260902-example-member-shortest-path-checklist.md`
 - Modify: `.agents/skills/xcpc-experience-coach/references/knowledge/20260902-example-member-transfer-training.md`
+- Modify: `.agents/skills/xcpc-experience-coach/references/knowledge/20260902-jianhuowang-int128-requires-64bit.md`
+- Modify: `.agents/skills/xcpc-experience-coach/references/knowledge/20260902-jianhuowang-abc221e-leq.md`
 
 **Interfaces:**
 - Consumes: Frontmatter 文本及 `validate(content, filename)` 测试辅助函数。
@@ -74,6 +76,16 @@ test("rejects the legacy reviewers field", () => {
 });
 ```
 
+加入空作者列表测试：
+
+```js
+test("rejects an empty author list", () => {
+  const result = validate(entry({ authors: "," }));
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /authors/);
+});
+```
+
 - [ ] **Step 3: 运行测试并确认 RED**
 
 Run:
@@ -97,7 +109,7 @@ const requiredFields = ["kind", "topics", "evidence", "authors", "status", "upda
 
 ```js
 const authors = list(fields.authors ?? "");
-if (authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) {
+if (!authors.length || authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) {
   errors.push("authors 必须使用 GitHub @用户名");
 }
 ```
@@ -112,7 +124,7 @@ node --test tests\validate.test.mjs
 
 Expected: 7 tests pass，0 fail。
 
-- [ ] **Step 6: 迁移 Schema 与三个示例**
+- [ ] **Step 6: 迁移 Schema 与 5 条知识**
 
 在 `contribution-schema.md` 的 Frontmatter 示例中删除：
 
@@ -128,11 +140,16 @@ reviewers: "@senior"
 - 审核人与合并人不写入条目，以 GitHub PR review 和 merge history 为准
 ```
 
-从三个知识示例的 Frontmatter 中分别删除：
+从 3 个 `deprecated` 知识示例的 Frontmatter 中分别删除：
 
 ```yaml
 reviewers: "@example-reviewer"
 ```
+
+确认任务期间新增的 2 个 `active` 条目也符合迁移后的 Frontmatter：
+
+- `20260902-jianhuowang-int128-requires-64bit.md`
+- `20260902-jianhuowang-abc221e-leq.md`
 
 - [ ] **Step 7: 验证整个知识目录**
 
