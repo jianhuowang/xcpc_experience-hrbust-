@@ -3,7 +3,6 @@ kind: training
 topics: training, transfer
 evidence: single-case
 authors: "@example-member"
-reviewers: "@example-reviewer"
 status: deprecated
 updated: 2026-09-02
 related:

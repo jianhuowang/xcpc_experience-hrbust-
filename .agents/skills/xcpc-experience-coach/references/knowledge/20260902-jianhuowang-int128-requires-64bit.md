@@ -3,7 +3,6 @@ kind: debugging
 topics: debugging, environment, integer
 evidence: single-case
 authors: "@jianhuowang"
-reviewers: "@to-reviewer"
 status: active
 updated: 2026-09-02
 ---

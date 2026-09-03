@@ -12,7 +12,6 @@ kind: algorithm
 topics: graph, shortest-path
 evidence: repeated-practice
 authors: "@alice"
-reviewers: "@senior"
 status: active
 updated: 2026-09-02
 related: 20260820-bob-dijkstra-debugging
@@ -22,8 +21,9 @@ related: 20260820-bob-dijkstra-debugging
 - `kind`：`algorithm / implementation / debugging / contest / team / training`
 - `evidence`：`single-case / repeated-practice / source-backed / team-consensus`
 - `status`：`active / deprecated`
-- `topics`、`authors`、`reviewers` 可用英文逗号分隔多项
-- `reviewers` 至少包含一位非作者
+- `topics`、`authors` 可用英文逗号分隔多项
+- `authors` 至少包含一位投稿者，并使用 GitHub `@用户名`
+- 审核人与合并人不写入条目；GitHub PR approvals、CODEOWNERS 和 merge history 是唯一审核审计来源
 - `related` 可省略或填写逗号分隔的稳定条目 ID
 
 ## 公共正文

@@ -2,7 +2,7 @@
 
 ## 先看当前状态
 
-仓库目前已经具备 Skill、投稿 Schema、PR 审核和自动校验，但三个知识条目均为 `deprecated` 示例。成员提交并合并第一批 `status: active` 条目前，查询时出现“知识库暂无对应条目”是正常结果。
+仓库目前已经具备 Skill、投稿 Schema、PR 审核和自动校验，共有 5 条知识：2 条 `active`、3 条 `deprecated` 示例。
 
 ## 选择使用方式
 
@@ -96,6 +96,8 @@ DSH 同时支持用户级 `~/.agents/skills/`。若希望在所有 DSH 项目中
    ```
 
 5. 推送分支并发起 Pull Request，等待 CODEOWNERS 审核。
+
+投稿者不填写 `reviewers`。实际审核人和合并人以 GitHub PR 的 review 与 merge history 为准。
 
 Skill 可以整理草稿，但不会在没有明确授权时替成员提交或创建 PR。
 

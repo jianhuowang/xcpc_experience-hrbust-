@@ -13,7 +13,6 @@ function entry(overrides = {}) {
     topics: "graph, shortest-path",
     evidence: "source-backed",
     authors: '"@alice"',
-    reviewers: '"@bob"',
     status: "active",
     updated: "2026-09-02",
     related: "",
@@ -25,7 +24,6 @@ kind: ${fields.kind}
 topics: ${fields.topics}
 evidence: ${fields.evidence}
 authors: ${fields.authors}
-reviewers: ${fields.reviewers}
 status: ${fields.status}
 updated: ${fields.updated}
 related: ${fields.related}
@@ -67,7 +65,7 @@ function validate(content, filename = "20260902-alice-shortest-path.md") {
   return result;
 }
 
-test("accepts a valid algorithm entry", () => {
+test("accepts a valid entry without reviewers", () => {
   const result = validate(entry());
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
@@ -78,10 +76,26 @@ test("rejects an unknown kind", () => {
   assert.match(result.stderr, /kind/);
 });
 
-test("rejects author-only review", () => {
-  const result = validate(entry({ reviewers: '"@alice"' }));
+test("rejects missing authors", () => {
+  const result = validate(entry({ authors: "" }));
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /reviewer/i);
+  assert.match(result.stderr, /缺少字段：authors/);
+});
+
+test("rejects an empty author list", () => {
+  const result = validate(entry({ authors: "," }));
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /authors 必须使用 GitHub @用户名/);
+});
+
+test("rejects the legacy reviewers field", () => {
+  const content = entry().replace(
+    'authors: "@alice"\n',
+    'authors: "@alice"\nreviewers: "@bob"\n',
+  );
+  const result = validate(content);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /未知字段：reviewers/);
 });
 
 test("rejects missing type-specific headings", () => {
