@@ -97,6 +97,8 @@ DSH 同时支持用户级 `~/.agents/skills/`。若希望在所有 DSH 项目中
 
 5. 推送分支并发起 Pull Request，等待 CODEOWNERS 审核。
 
+投稿者不填写 `reviewers`。实际审核人和合并人以 GitHub PR 的 review 与 merge history 为准。
+
 Skill 可以整理草稿，但不会在没有明确授权时替成员提交或创建 PR。
 
 ## 能做与不能做
