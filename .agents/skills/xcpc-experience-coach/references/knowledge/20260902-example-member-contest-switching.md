@@ -3,7 +3,6 @@ kind: contest
 topics: contest, switching
 evidence: single-case
 authors: "@example-member"
-reviewers: "@example-reviewer"
 status: deprecated
 updated: 2026-09-02
 related:

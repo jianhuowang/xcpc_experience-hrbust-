@@ -3,7 +3,6 @@ kind: algorithm
 topics: graph, shortest-path
 evidence: single-case
 authors: "@example-member"
-reviewers: "@example-reviewer"
 status: deprecated
 updated: 2026-09-02
 related:

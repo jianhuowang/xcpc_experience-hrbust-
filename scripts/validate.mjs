@@ -2,8 +2,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 
 const knowledgeRoot = resolve(process.argv[2] ?? ".agents/skills/xcpc-experience-coach/references/knowledge");
-const allowedFields = new Set(["kind", "topics", "evidence", "authors", "reviewers", "status", "updated", "related"]);
-const requiredFields = ["kind", "topics", "evidence", "authors", "reviewers", "status", "updated"];
+const allowedFields = new Set(["kind", "topics", "evidence", "authors", "status", "updated", "related"]);
+const requiredFields = ["kind", "topics", "evidence", "authors", "status", "updated"];
 const enums = {
   kind: ["algorithm", "implementation", "debugging", "contest", "team", "training"],
   evidence: ["single-case", "repeated-practice", "source-backed", "team-consensus"],
@@ -71,10 +71,8 @@ function validateFile(path) {
   if (fields.updated && !/^\d{4}-\d{2}-\d{2}$/.test(fields.updated)) errors.push("updated 必须为 YYYY-MM-DD");
   if (!list(fields.topics ?? "").length) errors.push("topics 至少包含一项");
 
-  const authors = new Set(list(fields.authors ?? ""));
-  const reviewers = list(fields.reviewers ?? "");
-  if ([...authors, ...reviewers].some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 和 reviewers 必须使用 GitHub @用户名");
-  if (!reviewers.some((reviewer) => !authors.has(reviewer))) errors.push("reviewers 至少包含一位非作者 reviewer");
+  const authors = list(fields.authors ?? "");
+  if (authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 必须使用 GitHub @用户名");
 
   for (const id of list(fields.related ?? "")) {
     if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+$/.test(id)) errors.push(`related 条目 ID 非法：${id}`);
