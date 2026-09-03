@@ -3,7 +3,6 @@ kind: training
 topics: contribution, fenwick-tree, subsequence
 evidence: single-case
 authors: "@jianhuowang"
-reviewers: "@to-reviewer"
 status: active
 updated: 2026-09-02
 ---
