@@ -21,7 +21,7 @@
 
 ## 迁移
 
-仓库目前没有 active 知识条目，只需迁移三个 deprecated 示例。尚未合并的投稿分支若包含 `reviewers`，应删除该字段后重新运行校验。
+仓库目前有 5 条知识（2 条 `active`、3 条 `deprecated` 示例），只需迁移三个 deprecated 示例。尚未合并的投稿分支若包含 `reviewers`，应删除该字段后重新运行校验。
 
 ## 验证
 

@@ -110,7 +110,7 @@ Run:
 node --test tests\validate.test.mjs
 ```
 
-Expected: 6 tests pass，0 fail。
+Expected: 7 tests pass，0 fail。
 
 - [ ] **Step 6: 迁移 Schema 与三个示例**
 
@@ -143,7 +143,7 @@ npm test
 npm run validate
 ```
 
-Expected: 6 tests pass；输出 `Validated 3 knowledge entries.`。
+Expected: 7 tests pass；输出 `Validated 5 knowledge entries.`。
 
 - [ ] **Step 8: 提交 Task 1**
 
@@ -193,8 +193,8 @@ git diff --check
 
 Expected:
 
-- 6 tests pass，0 fail；
-- `Validated 3 knowledge entries.`；
+- 7 tests pass，0 fail；
+- `Validated 5 knowledge entries.`；
 - `Skill is valid!`；
 - `git diff --check` 无输出且退出码为 0。
 
