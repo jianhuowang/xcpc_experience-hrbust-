@@ -2,6 +2,7 @@
   "name": "xcpc-experience-hrbust",
   "private": true,
   "scripts": {
+    "build-index": "node scripts/build-index.mjs",
     "bundle": "node scripts/bundle.mjs",
     "test": "node --test",
     "validate": "node scripts/validate.mjs"
