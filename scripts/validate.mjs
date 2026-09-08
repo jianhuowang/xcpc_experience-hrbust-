@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { basename, resolve } from "node:path";
+import { knowledgeFiles, parseDocument } from "./knowledge.mjs";
 
 const knowledgeRoot = resolve(process.argv[2] ?? ".agents/skills/xcpc-experience-coach/references/knowledge");
 const allowedFields = new Set(["kind", "topics", "evidence", "authors", "status", "updated", "related"]);
@@ -19,27 +20,6 @@ const typeHeadings = {
   training: ["暴露的问题", "训练动作", "完成标准", "复测结果"],
 };
 
-function filesUnder(path) {
-  if (statSync(path).isFile()) return [path];
-  return readdirSync(path, { withFileTypes: true }).flatMap((item) => {
-    const child = join(path, item.name);
-    return item.isDirectory() ? filesUnder(child) : item.name.endsWith(".md") ? [child] : [];
-  });
-}
-
-function parseDocument(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  if (!match) throw new Error("缺少合法 Frontmatter");
-  const fields = {};
-  for (const line of match[1].split(/\r?\n/)) {
-    if (!line.trim()) continue;
-    const field = line.match(/^([a-z]+):\s*(.*)$/);
-    if (!field) throw new Error(`无法解析 Frontmatter 行：${line}`);
-    fields[field[1]] = field[2].trim().replace(/^(["'])(.*)\1$/, "$2");
-  }
-  return { fields, body: match[2] };
-}
-
 function list(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
@@ -49,7 +29,7 @@ function section(body, heading) {
   return body.match(new RegExp(`^## ${escaped}\\s*\\r?\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "m"))?.[1]?.trim() ?? "";
 }
 
-function validateFile(path) {
+function validateFile(path, knownIds, activeBodies) {
   const errors = [];
   const name = basename(path);
   if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+\.md$/.test(name)) errors.push("文件名必须符合 YYYYMMDD-author-short-title.md");
@@ -62,6 +42,16 @@ function validateFile(path) {
   }
   const { fields, body } = document;
 
+  if (fields.status === "active") {
+    // ponytail: 只拦截确定的正文复制；改写后的语义重复交给投稿 Skill 对比。
+    const normalized = body.replace(/\r\n/g, "\n")
+      .replace(/^(?:[ \t]*\n)*#[ \t]+[^\n]*(?:\n|$)/, "")
+      .replace(/^(?:[ \t]*\n)+|(?:\n[ \t]*)+$/g, "");
+    const existing = activeBodies.get(normalized);
+    if (existing) errors.push(`active 正文重复：${basename(path, ".md")} 与 ${existing}；请引用或补充已有条目`);
+    else activeBodies.set(normalized, basename(path, ".md"));
+  }
+
   for (const key of Object.keys(fields)) if (!allowedFields.has(key)) errors.push(`未知字段：${key}`);
   for (const key of requiredFields) if (!fields[key]) errors.push(`缺少字段：${key}`);
   for (const [key, values] of Object.entries(enums)) {
@@ -70,28 +60,42 @@ function validateFile(path) {
 
   if (fields.updated && !/^\d{4}-\d{2}-\d{2}$/.test(fields.updated)) errors.push("updated 必须为 YYYY-MM-DD");
   if (!list(fields.topics ?? "").length) errors.push("topics 至少包含一项");
+  const topics = (fields.topics ?? "").split(",").map((topic) => topic.trim());
+  if (topics.some((topic) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(topic))) errors.push("topics 每项必须使用小写 kebab-case，且不能有空项");
+  if (new Set(topics).size !== topics.length) errors.push("topics 不得重复");
 
   const authors = list(fields.authors ?? "");
   if (!authors.length || authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 必须使用 GitHub @用户名");
 
   for (const id of list(fields.related ?? "")) {
     if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+$/.test(id)) errors.push(`related 条目 ID 非法：${id}`);
+    else if (id === basename(path, ".md")) errors.push(`related 不能指向自身：${id}`);
+    else if (!knownIds.has(id)) errors.push(`related 条目不存在：${id}`);
   }
 
   const headings = [...commonHeadings, ...(typeHeadings[fields.kind] ?? [])];
-  for (const heading of headings) if (!section(body, heading)) errors.push(`缺少内容：## ${heading}`);
+  for (const heading of headings) {
+    const content = section(body, heading);
+    if (!content) errors.push(`缺少内容：## ${heading}`);
+    else if (fields.status === "active" && /^(?:TODO\b|TBD\b|待补充|替换为)/i.test(content)) {
+      errors.push(`active 条目不能保留占位内容：## ${heading}`);
+    }
+  }
   if (/http:\/\//i.test(section(body, "来源"))) errors.push("外部来源必须使用 HTTPS");
 
   return errors;
 }
 
 let failures = 0;
-for (const path of filesUnder(knowledgeRoot)) {
-  for (const error of validateFile(path)) {
+const files = knowledgeFiles(knowledgeRoot);
+const knownIds = new Set(files.map((path) => basename(path, ".md")));
+const activeBodies = new Map();
+for (const path of files) {
+  for (const error of validateFile(path, knownIds, activeBodies)) {
     failures += 1;
     console.error(`${path}: ${error}`);
   }
 }
 
 if (failures) process.exitCode = 1;
-else console.log(`Validated ${filesUnder(knowledgeRoot).length} knowledge entries.`);
+else console.log(`Validated ${files.length} knowledge entries.`);

@@ -1,20 +1,19 @@
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { basename, relative, resolve, sep } from "node:path";
+import { knowledgeFiles, parseDocument } from "./knowledge.mjs";
 
 const knowledgeRoot = resolve(process.argv[2] ?? ".agents/skills/xcpc-experience-coach/references/knowledge");
 const outputPath = resolve(process.argv[3] ?? "XCPC_EXPERIENCE.md");
 const repository = "https://github.com/jianhuowang/xcpc_experience-hrbust-";
 const rawBundle = "https://raw.githubusercontent.com/jianhuowang/xcpc_experience-hrbust-/main/XCPC_EXPERIENCE.md";
 
-const entries = readdirSync(knowledgeRoot)
-  .filter((name) => name.endsWith(".md"))
-  .sort()
-  .map((name) => {
-    const content = readFileSync(join(knowledgeRoot, name), "utf8").trim();
-    const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? "";
-    const status = frontmatter.match(/^status:\s*(active|deprecated)\s*$/m)?.[1];
-    if (!status) throw new Error(`${name}: 缺少或无法识别 status`);
-    return { content, id: basename(name, ".md"), name, status };
+const entries = knowledgeFiles(knowledgeRoot)
+  .map((path) => {
+    const source = readFileSync(path, "utf8");
+    const { fields: { status } } = parseDocument(source);
+    if (!["active", "deprecated"].includes(status)) throw new Error(`${path}: 缺少或无法识别 status`);
+    const name = (relative(knowledgeRoot, path) || basename(path)).split(sep).map(encodeURIComponent).join("/");
+    return { content: source.trim(), id: basename(path, ".md"), name, status };
   })
   .filter(({ status }) => status === "active");
 
