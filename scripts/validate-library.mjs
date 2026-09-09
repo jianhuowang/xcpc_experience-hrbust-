@@ -69,7 +69,10 @@ export function validateLibrary(root, { verifySnapshot = true } = {}) {
   for (const name of ['LICENSE', 'CONTENT-LICENSE.md']) {
     const source = manifest.entries.find((entry) => entry.path === name);
     const licenseFile = resolve(root, 'licenses', name);
-    requireValue(source && existsSync(licenseFile) && sha256(readFileSync(licenseFile)) === source.sha256, `原始许可缺失或哈希不匹配：${name}`);
+    requireValue(source && existsSync(licenseFile), `原始许可缺失：${name}`);
+    const bytes = readFileSync(licenseFile);
+    const blob = createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+    requireValue(sha256(bytes) === source.sha256 && blob === source.git_blob_sha1, `原始许可哈希与固定快照不匹配：${name}`);
   }
   if (verifySnapshot) {
     const tree = [...manifest.entries].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0)

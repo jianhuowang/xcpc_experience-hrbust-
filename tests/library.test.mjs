@@ -29,7 +29,8 @@ function fixture(run) {
     manifest.entries.push({ ...entry, id: `wzj52501-${hash(name).slice(0, 16)}`, path: name,
       format: name === 'LICENSE' ? 'text' : 'md', group: '.', role: 'metadata', status: 'metadata',
       source_url: `https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/${commit}/${name}`,
-      sha256: hash(content), text_path: null, text_sha256: null, units: 0 });
+      sha256: hash(content), git_blob_sha1: createHash('sha1').update(`blob ${Buffer.byteLength(content)}\0${content}`).digest('hex'),
+      bytes: Buffer.byteLength(content), text_path: null, text_sha256: null, units: 0 });
     writeFileSync(join(root, 'licenses', name), content);
   }
   const save = () => writeFileSync(join(root, 'manifest.json'), JSON.stringify(manifest));
@@ -71,9 +72,11 @@ test('detects changed or missing extracted text', () => fixture(({ root, entry }
   assert.throws(() => validateLibrary(root), /missing|不存在/i);
 }));
 
-test('rejects altered licenses and a manifest that is not the pinned complete snapshot', () => fixture(({ root }) => {
+test('rejects altered licenses and a manifest that is not the pinned complete snapshot', () => fixture(({ root, manifest, save }) => {
   assert.throws(() => validatePinnedLibrary(root), /快照/);
   writeFileSync(join(root, 'licenses/LICENSE'), 'changed');
+  assert.throws(() => validateLibrary(root), /许可/);
+  manifest.entries.find((entry) => entry.path === 'LICENSE').sha256 = hash('changed'); save();
   assert.throws(() => validateLibrary(root), /许可/);
   rmSync(join(root, 'licenses/LICENSE'));
   assert.throws(() => validateLibrary(root), /许可/);
