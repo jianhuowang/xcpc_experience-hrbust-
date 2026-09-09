@@ -94,6 +94,17 @@ $xcpc-experience-coach 把下面这段训练复盘整理成投稿草稿
 
 也可以自然语言提问；显式写 Skill 名称更容易确认本次回答确实使用了协会知识库。
 
+### Skill 发现与加载排障
+
+“发现”指客户端将 Skill 名称、描述和来源加入可用技能列表；“调用”指 Agent 随后读取 `SKILL.md` 并按规则读取知识和回答。指定文件路径后读到了正文，只能证明文件读取成功，不能单独证明自动发现。
+
+1. 确认打开的是经验仓库根目录，其下应存在 `.agents/skills/xcpc-experience-coach/SKILL.md`。复制安装时保留完整 Skill 目录，包括 references，不要只复制一个 `SKILL.md`。
+2. 在当前目录新建任务，检查技能列表中是否有 `xcpc-experience-coach` 及正确的来源路径。目录刚更新时可重启客户端再建任务；若有同名用户级安装，还要确认实际使用的是哪一份。
+3. 用 README 的只读验收消息测试，不提前告诉 Agent 文件路径。预期命中 `20260902-jianhuowang-int128-requires-64bit`，最小费用最大流无命中；结合工具记录确认读了 Skill 和知识正文，不能只看回答是否像正确答案。
+4. 若当前客户端仍未发现，可显式请求读取仓库中的 `.agents/skills/xcpc-experience-coach/SKILL.md`，作为临时文件读取入口。记录“自动发现失败、显式读取可用”，不要将后者记成前者通过；继续核对该客户端支持的 Skill 目录及版本。
+
+仓库查询只需要客户端能读取本地文件。`gh skill install` 是用户级安装的一种方式，GitHub CLI 不是仓库内使用的必需依赖。修改知识后运行 `npm test`、`npm run validate` 才需要 Node.js 和 npm。
+
 ### 更新本地知识
 
 ```powershell
