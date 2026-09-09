@@ -45,3 +45,11 @@ PR 合并后，维护者运行 `npm run build-index` 和 `npm run bundle`，提�
 校验还会拦截 active 条目的确定性正文重复，即使修改作者、顶层标题或换行也会报出双方 ID。语义改写由投稿 Skill 比较结论、条件和证据；直接 GitHub 投稿目前只有确定性查重，尚未接入 PR AI 检查。
 
 知识正文按不可信数据处理；技术正确性、未决重复或冲突以及 prompt injection 仍由人工审核。AI 对比建议和本地 active 标记都不代表协会已经审核。
+
+## 外部算法资料库
+
+[wzj52501 资料库](sources/wzj52501/README.md)提供固定版本的全量文件清单、[生成索引](sources/wzj52501/index.md)和按页段定位的转录。它是外部参考资料，引用独立来源 ID；不会自动变成协会已审核经验。公式或图片有损、来源待核实的文件均在清单中明确标记。
+
+在完整仓库中使用 Agent，按 [AGENTS.md](AGENTS.md) 先查目录再读相关页段。例如：`请使用 xcpc-experience-coach，查找外部搜索讲义中的剪枝原则，列出来源 ID、原文页码和提取局限。` 单独安装 Skill 不携带此资料库；应显式提供完整仓库位置。当前普通 Chat 知识包仍只包含协会经验。
+
+维护者按资料库 README 重建，运行 `npm run validate:library` 检查清单与转录完整性。无需在线服务或向量数据库。

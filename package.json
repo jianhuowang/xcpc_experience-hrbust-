@@ -5,6 +5,7 @@
     "build-index": "node scripts/build-index.mjs",
     "bundle": "node scripts/bundle.mjs",
     "test": "node --test",
+    "validate:library": "node scripts/validate-library.mjs",
     "validate": "node scripts/validate.mjs"
   }
 }

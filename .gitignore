@@ -1,1 +1,3 @@
 .worktrees/
+.cache/
+__pycache__/
