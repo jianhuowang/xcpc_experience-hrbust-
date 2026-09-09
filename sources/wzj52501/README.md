@@ -6,11 +6,11 @@
 
 ## 怎么查
 
-当前直接浏览索引，再按清单定位相应转录；仅安装用户级 Skill 不会复制这里的资料。Skill 的外部检索协议和客户端验收留待下一步 PR，本资料 PR 不增加该行为。
+在完整 exp 仓库中启动 Agent，按根目录 [AGENTS.md](../../AGENTS.md) 的检索规则操作。仅安装用户级 Skill 不会复制这里的资料。
 
 目录定位可从这些中英文词开始：搜索／search／DFS，动态规划／dynamic programming／DP，图论／graph，数据结构／data structures，数论／number theory。它们是检索别名，不保证任意题目都被对应讲义覆盖；进入候选文档后核对实际内容和适用条件。
 
-本批明确提供搜索和 DP 讲义的转录，例如 `Lectures/Search.pdf` 与 `Lectures/Dynamic-Programming.pdf`；不是只有之前试用的三个经验摘要。题面、题解和代码按原路径保留来源，目录分组不等于已经核实同题。讲义也可能包含例题完整解法，不能仅凭文件分类判断是否适合盲做阅读。
+本批明确提供搜索和 DP 讲义的转录，例如 `Lectures/Search.pdf` 与 `Lectures/Dynamic-Programming.pdf`；不是只有之前试用的三个经验摘要。题面、题解和代码按原路径保留来源，目录分组不等于已经核实同题。H1/H2 盲做先查看目录，避免搜索或读取目标题解；用户明确请求 H3 后才能使用直接题解，并披露来源。
 
 ## 状态与证据
 
@@ -59,4 +59,4 @@ python -m unittest discover -s tests -p 'test_import_library.py'
 
 导入器与 `npm run validate:library` 都固定校验原路径与 Git blob SHA1 清单摘要，拒绝冒用版本号、增删文件或篡改归档。更新快照时须从对应 Git tree 独立核实后，同时更新 Python 和 Node 中的 commit 与摘要常量。校验另检查 ID、路径、状态、重复关联、原始许可及转录哈希；withheld/failed 对应位置若残留旧正文会报错，维护者核实后显式处理，不自动删除文件。
 
-这些检查不能证明原文算法正确。修改源接入脚本时还运行 `npm test`、`npm run validate` 和 Python 回归。普通 Chat 知识包本轮不增加这些外部全文。实际验证与待验收项见[接入验收记录](../../docs/acceptance-full-library.md)。
+这些检查不能证明原文算法正确。修改源接入脚本时还运行 `npm test`、`npm run validate` 和 Python 回归。普通 Chat 知识包本轮不增加这些外部全文。资料校验见[数据验收记录](../../docs/acceptance-full-library.md)，客户端验证与待验收项见[Agent 验收记录](../../docs/acceptance-external-agent.md)。
