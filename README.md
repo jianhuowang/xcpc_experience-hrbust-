@@ -2,6 +2,31 @@
 
 协会 XCPC 经验知识库。成员通过 Pull Request 投稿，审核通过后可交给普通网页 Chat 或 `xcpc-experience-coach` Skill 查询和引用。
 
+## 快速开始：在仓库中使用 Agent
+
+前置条件：已安装 Git，以及已登录、支持仓库 Skill 的 Agent 客户端。下面以 Codex 为例；在仓库内查询无需安装用户级 Skill，也不需要 GitHub CLI。修改知识并运行校验时才需要 Node.js 和 npm。
+
+1. 在 PowerShell 中获取仓库：
+
+   ```powershell
+   git clone https://github.com/jianhuowang/xcpc_experience-hrbust-.git
+   Set-Location xcpc_experience-hrbust-
+   ```
+
+2. 用 Codex 打开这个仓库目录并新建任务。应能在当前目录看到本 README 和 `AGENTS.md`；不要打开包含多个项目的上级目录。已安装 Codex CLI 的用户也可以在此运行 `codex`。
+
+3. 先发送下面的只读验收消息，确认发现和调用均成功：
+
+   ```text
+   只测试，不修改文件、不创建 PR、不联网。
+   请先检查客户端提供的可用 Skill 列表是否包含 xcpc-experience-coach，报告其来源路径；未发现就明确说明，不通过搜索文件补救。
+   发现后使用该 Skill 查询协会关于 __int128 评测环境的经验，列出完整条目 ID 和实际读取的文件；再查询最小费用最大流，没有就明确说明。
+   ```
+
+当前预期：发现本仓库的 `xcpc-experience-coach`，读取 Skill 和知识正文，命中 `20260902-jianhuowang-int128-requires-64bit`；最小费用最大流应回答“知识库暂无对应条目”。仅声称“已加载”不算验收，需要结合客户端可用技能列表或实际读取记录确认。
+
+未发现时按 [Skill 发现与加载排障](docs/usage.md#skill-发现与加载排障) 检查。其他使用方式：在别的项目中使用请看 [用户级安装](docs/usage.md#安装为用户级-skill)，普通网页 Chat 请看 [手动上传知识包](docs/usage.md#普通网页-chat无需安装)。这两种方式不属于上述仓库内快速开始的前置步骤。
+
 ## 项目职责
 
 这是由 GitHub PR 治理的共享经验知识库。Skill 和单文件知识包是两种使用入口：
