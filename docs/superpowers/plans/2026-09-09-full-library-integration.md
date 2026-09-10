@@ -1,16 +1,17 @@
 # wzj52501 全量资料库接入计划
 
-状态：2026-09-09 按用户要求拆分审查。PR #11 仅包含全量清单、转录、索引、维护工具和数据验收；本依赖草稿恢复 Agent 检索协议，既有客户端测试与待完成行为验收见 `docs/acceptance-external-agent.md`。暂不扩展普通 Chat 适配。资料层验收见 `docs/acceptance-full-library.md`。
+状态：2026-09-10 继续处理 PR #12。资料层 PR #11 已合并至 main `601807f`；本分支已同步 main，接入 Agent 检索协议并使用 WorkBuddy / Deepseek-V4-Pro 实测。场景、实际结果和局限见 `docs/acceptance-external-agent.md`。暂不扩展普通 Chat 适配，提取质量修复仍按文末待办按需处理。资料层验收见 `docs/acceptance-full-library.md`。
 
 实施记录：使用现有 `feat/external-lecture-pilot` 隔离工作树，基于 main `29db3ba`；PR #10 尚未合并，保留其独立分支。固定 ZIP 已获取，135 个文件均在 Git tree 中列出。来源核查发现第三方署名及来源不明材料，纳入清单并标记正文暂缓发布；不将其默认为 wzj52501 独立原创。原文获取和解析由 Python 标准库与 pypdf 执行，分发数据校验使用 Node.js 标准库，不增加在线检索服务。
 
 - [x] 全量文件与来源许可核查，135 项；核查记录在本次来源库说明中落地。
 - [x] 导入器与安全边界回归；清单、正文及索引生成。
 - [x] Node.js 清单／正文完整性校验；已配置 CI，本地运行通过。
-- [x] AGENTS.md／Skill 按需检索协议：已移入本依赖草稿，不属于 PR #11。
+- [x] AGENTS.md／Skill 按需检索协议：由 PR #12 接入，不属于 PR #11。
 - [x] 全量覆盖、提取局限、原文哈希、重复来源及代码复核。
 - [x] WorkBuddy 基础检索已有用户回传记录，已移入本依赖草稿；不表示后续行为验收完成。
-- [ ] 修订后 WorkBuddy 公式引用、H1/H3 与单独安装缺库的客户端验收。
+- [x] WorkBuddy 公式不猜测复测、未知目标题目 H1 实测、真实缺库 Skill 副本显式调用通过。
+- [x] WorkBuddy H3 直接题解及补充题面的完整来源引用复测通过，失败与修订记录保留；仅代表本轮显式入口样本，不代表任意模型或算法正确性保证。
 
 ## 目标与边界
 
