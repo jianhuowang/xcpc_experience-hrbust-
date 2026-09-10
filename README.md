@@ -4,7 +4,7 @@
 
 ## 快速开始：在仓库中使用 Agent
 
-前置条件：已安装 Git，以及已登录、支持仓库 Skill 的 Agent 客户端。下面以 Codex 为例；在仓库内查询无需安装用户级 Skill，也不需要 GitHub CLI。修改知识并运行校验时才需要 Node.js 和 npm。
+前置条件：已安装 Git，以及已登录、支持仓库 Skill 的 Agent 客户端。下面以 Codex 为例；在仓库内查询无需安装用户级 Skill，也不需要 GitHub CLI。运行校验或可选 MCP 服务时需要 Node.js 22+ 和 npm，首次执行前运行 `npm ci`。
 
 1. 在 PowerShell 中获取仓库：
 
@@ -29,19 +29,20 @@
 
 ## 项目职责
 
-这是由 GitHub PR 治理的共享经验知识库。Skill 和单文件知识包是两种使用入口：
+这是由 GitHub PR 治理的共享经验知识库，提供 Skill、单文件知识包和可选只读 MCP 三种使用入口：
 
 | 层 | 职责 |
 |---|---|
 | 知识源 | Skill 的 `references/knowledge/*.md`，保存可审核、可引用的经验 |
 | 治理 | Schema、校验脚本、测试与 GitHub PR 人工审核 |
-| 客户端适配 | `SKILL.md` 服务 Agent，`XCPC_EXPERIENCE.md` 服务普通网页 Chat |
+| 客户端适配 | `SKILL.md` 服务 Agent，`XCPC_EXPERIENCE.md` 用于上传，`mcp/` 为网页 ChatGPT 提供按需只读查询 |
 
 知识放在 Skill 内便于随安装分发；目前无需迁移目录。私人训练记录、复习队列与排程属于独立的 **XCPC Trainer**，不在此仓库维护。仓库开发规则见 [AGENTS.md](AGENTS.md)。
 
 ## 立即使用
 
 - **普通网页 Chat**：下载并上传 [`XCPC_EXPERIENCE.md`](XCPC_EXPERIENCE.md)，然后直接提问。
+- **网页 ChatGPT MCP**：由维护者启动只读服务，连接后可查询协会经验和外部资料；见 [启动、连接与复习验收](docs/mcp-usage.md)。需要真实服务地址，GitHub 仓库链接不能作为 MCP URL。
 - **Codex / DeepSeek Harness**：克隆仓库后打开目录，调用 `xcpc-experience-coach`。
 - **浏览经验**：打开 [知识索引](.agents/skills/xcpc-experience-coach/references/knowledge-index.md)，按状态、类型或主题查找。
 - **投稿经验**：让 Skill 先比较已有内容，补充原条目或新增独立条目，通过 Pull Request 交给协会审核。
