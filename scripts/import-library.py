@@ -250,8 +250,46 @@ def index_markdown(entries):
     return "\n".join(lines) + "\n"
 
 
-def import_archive(archive, output):
+def correction_pages(files, corrections):
+    """只接受绑定固定原件的非 withheld PDF 页修订；不猜测或批量替换字符。"""
+    result = {}
+    for record in corrections:
+        if not isinstance(record, dict) or set(record) != {"id", "path", "source_sha256", "page", "extracted_sha256", "text", "reason"}:
+            raise ValueError("无效修订记录字段")
+        path, page = record["path"], record["page"]
+        if not isinstance(path, str) or path not in files or path in THIRD_PARTY or not path.endswith(".pdf"):
+            raise ValueError("修订只能指向固定快照中允许提取的 PDF")
+        if (record["id"] != "wzj52501-" + sha256(path.encode("utf8"))[:16]
+                or record["source_sha256"] != sha256(files[path])
+                or type(page) is not int or page < 1
+                or not isinstance(record["extracted_sha256"], str)
+                or not re.fullmatch(r"[a-f0-9]{64}", record["extracted_sha256"])
+                or any(not isinstance(record[key], str) or not record[key].strip() for key in ("text", "reason"))):
+            raise ValueError("修订来源、哈希、页码或正文无效")
+        pages = result.setdefault(path, {})
+        if page in pages:
+            raise ValueError("同一来源存在重复修订页码")
+        pages[page] = record
+    return result
+
+
+def correct_body(body, pages):
+    for page, record in pages.items():
+        heading = f"## 物理页 {page}"
+        pattern = re.compile(r"^" + re.escape(heading) + r"\n\n(?P<fence>`{3,})text\n.*?\n(?P=fence)\n", re.M | re.S)
+        matches = list(pattern.finditer(body))
+        if len(matches) != 1 or sha256(matches[0].group().encode("utf8")) != record["extracted_sha256"]:
+            raise ValueError(f"修订页 {page} 的原始提取内容不匹配；停止导入，需重新核对")
+        note = f"[视觉转录修订：已对照固定原件物理页 {page}；仅此页正文，不代表整份材料已审核。]"
+        replacement = heading + "\n\n" + fenced(note + "\n" + record["text"])
+        match = matches[0]
+        body = body[:match.start()] + replacement + body[match.end():]
+    return body
+
+
+def import_archive(archive, output, corrections=()):
     files = read_archive(archive)
+    revised = correction_pages(files, corrections)
     entries, outputs, duplicates = [], {}, {}
     for path, data in sorted(files.items()):
         extension = PurePosixPath(path).suffix.lstrip(".").lower() or "text"
@@ -282,15 +320,22 @@ def import_archive(archive, output):
                 entry["warnings"].append(LAYOUT_WARNING)
             try:
                 body, entry["units"] = extract(data, extension, entry["warnings"])
+            except Exception as error:
+                entry["status"] = "failed"
+                entry["warnings"].append(f"提取失败：{type(error).__name__}: {error}")
+                if path in revised:
+                    raise ValueError(f"待修订来源提取失败：{path}") from error
+            else:
+                if path in revised:
+                    body = correct_body(body, revised[path])
+                    entry["warnings"].append("局部视觉转录修订：物理页 " + ", ".join(map(str, revised[path]))
+                                             + "；依据与修订文本见 sources/wzj52501/corrections.json，其余页仍待核对。")
                 if entry["warnings"] and role != "metadata":
                     entry["status"] = "needs-review"
                 entry["text_path"] = f"text/{path}.md"
                 content = wrapper(entry, body).encode("utf-8")
                 entry["text_sha256"] = sha256(content)
                 outputs[entry["text_path"]] = content
-            except Exception as error:
-                entry["status"] = "failed"
-                entry["warnings"].append(f"提取失败：{type(error).__name__}: {error}")
         entries.append(entry)
     manifest = {"version": 1, "upstream": {"repository": REPOSITORY, "commit": COMMIT}, "entries": entries}
     outputs["manifest.json"] = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
@@ -326,6 +371,8 @@ def main():
     convert = subcommands.add_parser("import", help="离线读取 ZIP，生成清单与文本")
     convert.add_argument("--archive", type=Path, default=BASE / ".cache/library/upstream.zip")
     convert.add_argument("--output", type=Path, default=BASE / "sources/wzj52501")
+    convert.add_argument("--corrections", type=Path, default=BASE / "sources/wzj52501/corrections.json",
+                         help="原页修订记录；缺失或不匹配时失败，不自动猜测修复")
     args = parser.parse_args()
     try:
         if args.command == "fetch":
@@ -337,7 +384,10 @@ def main():
             args.archive.write_bytes(data)
             print(f"已下载固定归档：{args.archive}；SHA256 {sha256(data)}")
         else:
-            manifest = import_archive(args.archive, args.output)
+            corrections = json.loads(args.corrections.read_text("utf8"))
+            if not isinstance(corrections, list):
+                raise ValueError("修订记录必须为数组")
+            manifest = import_archive(args.archive, args.output, corrections=corrections)
             print(f"已登记 {len(manifest['entries'])} 个文件：{dict(Counter(e['status'] for e in manifest['entries']))}")
     except (OSError, ValueError, zipfile.BadZipFile) as error:
         parser.exit(1, f"导入失败：{error}\n")

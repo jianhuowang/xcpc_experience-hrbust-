@@ -45,11 +45,19 @@ test('H1/H2 never return bodies and reference cannot expose solutions', () => {
   assert.equal(result.metadata.direct_solution, true);
 });
 
-test('fetches bounded physical pages and preserves damaged symbols', () => {
+test('fetches corrected physical pages while preserving damage on untouched pages', () => {
   const item = catalog.search({ query: 'Search.pdf', scope: 'external' }).results[0];
   const page = catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 41, count: 1 });
   assert.match(page.metadata.location, /物理页 41/);
-  assert.match(page.text, /U\+00(?:14|15)/);
+  assert.match(page.text, /f\(x\) \+ g\(x\) ≤ cans/);
+  assert.doesNotMatch(page.text, /h\(x\)|U\+001[45]/);
+  assert.equal(page.metadata.status, 'needs-review');
+  assert.match(page.text, /视觉转录修订/);
+  assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 42 }).text, /h\(x\) ≥ g\(x\)/);
+  assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 43 }).text, /U\+0014/);
+  assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 11 }).text, /n × n[\s\S]*1 ≤ n ≤ 8/);
+  const dp = catalog.fetch({ id: 'wzj52501-6cc8051f4f4f2148', mode: 'reference', start: 8 });
+  assert.match(dp.text, /n ≤ 10\^7/);
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'line' }), /invalid_argument/);
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 1, count: 6 }), /invalid_argument/);
 });

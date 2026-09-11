@@ -44,6 +44,18 @@ PDF 采用物理页码，DOCX 采用段落／表格定位，PPTX 采用幻灯片
 
 ## 获取、重建和检查
 
+### 局部转录修订
+
+`corrections.json` 保存按原件页图核对的局部修订，默认由导入命令应用。每项绑定来源 ID、原路径、原件 SHA256、物理页码与原始提取页段 SHA256；哈希不匹配、页码不存在、重复修订或 withheld 来源会拒绝导入。不要直接编辑生成的 `text/`，否则下次重建会覆盖。
+
+首批为 Search.pdf 第 11、41、42 页与 Dynamic-Programming.pdf 第 8 页。页内标注“视觉转录修订”，清单保留 needs-review。修订是 Codex 对原页的转录，需随 PR 审核；不是协会算法审核，也没有全库 OCR。未修页不因相邻页修复而自动成为可信正文。
+
+已确认的特殊问题：Search 第 41 页的旧提取含隐藏动画文字，估价函数段落实际在第 42 页显示；DP 第 8 页的上标 `10^7` 原先被静默提取成 `107`。bishop-solution.docx 的嵌入公式仍待处理，不能把 PDF 修复泛化为 DOCX 已修复。复核记录见[首批修订记录](../../docs/acceptance-extraction-repair.md)。
+
+如需复现未修订原始结果，使用 Python 导入模块的 `import_archive(archive, output, corrections=[])` 写到单独临时目录；或为 CLI 的 `--corrections` 提供内容为 `[]` 的 JSON 文件。默认修订文件缺失时 CLI 会报错，避免悄悄退回旧正文。
+
+### 重建命令
+
 查询已提交的转录不需要 Python、PDF 解析器或 GitHub CLI；维护者重建时使用 Python 3.12+ 和 `scripts/requirements-library.txt` 中的 pypdf，DOCX/PPTX 处理使用 Python 标准库。脚本只读源文件，不编译或执行上游代码。
 
 ```powershell
