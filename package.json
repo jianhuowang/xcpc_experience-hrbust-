@@ -1,11 +1,17 @@
 {
   "name": "xcpc-experience-hrbust",
   "private": true,
+  "engines": { "node": ">=22" },
   "scripts": {
+    "start:mcp": "node mcp/server.mjs",
     "build-index": "node scripts/build-index.mjs",
     "bundle": "node scripts/bundle.mjs",
     "test": "node --test",
     "validate:library": "node scripts/validate-library.mjs",
     "validate": "node scripts/validate.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "4.6.1"
   }
 }

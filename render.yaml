@@ -1,0 +1,21 @@
+# Render 原生 Node 免费服务；从已合并的 main 部署公开只读知识。
+services:
+  - type: web
+    name: xcpc-experience-mcp
+    runtime: node
+    plan: free
+    branch: main
+    autoDeployTrigger: checksPass
+    buildCommand: npm ci && npm test && npm run validate && npm run validate:library
+    startCommand: npm run start:mcp
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: HOST
+        value: 0.0.0.0
+      - key: MCP_ALLOWED_HOSTS
+        fromService:
+          name: xcpc-experience-mcp
+          type: web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME

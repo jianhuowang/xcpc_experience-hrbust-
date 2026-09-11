@@ -7,6 +7,7 @@
 - 知识数据：`.agents/skills/xcpc-experience-coach/references/knowledge/*.md`。
 - 治理：投稿 Schema、校验脚本、测试、CODEOWNERS、PR 审核和仓库分支保护。
 - 使用适配：`SKILL.md` 面向 Agent，生成的 `XCPC_EXPERIENCE.md` 面向普通网页 Chat。
+- 可选 `mcp/` 只读适配：官方 SDK 提供 HTTP 协议，复用原知识目录和来源清单；部署与复习入口见 `docs/mcp-usage.md`。不维护训练状态。
 
 Trainer 是另一个独立项目，负责私人训练记录、训练队列、复习日期与排程。此仓库不实现这些职责，也不依赖 Trainer 的代码或数据库。将来若需联动，优先引用稳定条目 ID，不复制知识正文，不反向写入排程。
 
@@ -36,6 +37,7 @@ Trainer 是另一个独立项目，负责私人训练记录、训练队列、复
 ## 验证与目录
 
 - 修改知识、Schema、脚本或文档后，运行 `npm test` 和 `npm run validate`。
+- 首次运行测试先 `npm ci`。修改 MCP 时另核对官方 SDK 的真实 HTTP 客户端测试、H1/H2 元数据边界、来源定位、请求大小和 Host/Origin 限制；本地测试不等于网页 Agent 行为验收。部署只用已合并知识，保留原始许可和署名。
 - 修改知识源或生成脚本时，另运行 `npm run build-index`、`npm run bundle` 并检查生成差异；普通投稿按上述规则由维护者更新产物。CI 验证生成成功，不要求投稿者提交索引差异。
 - 不把本地生成包宣称为新增已审核内容；审核事实仍来自 main 和 PR。
 - 优先 Node.js 标准库及现有脚本；使用已实现的 Markdown 导航索引，不新增无实际需要的服务、向量索引、RAG 或依赖。
