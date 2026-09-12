@@ -45,7 +45,7 @@ test('H1/H2 never return bodies and reference cannot expose solutions', () => {
   assert.equal(result.metadata.direct_solution, true);
 });
 
-test('fetches corrected physical pages while preserving damage on untouched pages', () => {
+test('fetches visual and automatic repairs without promoting review status', () => {
   const item = catalog.search({ query: 'Search.pdf', scope: 'external' }).results[0];
   const page = catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 41, count: 1 });
   assert.match(page.metadata.location, /物理页 41/);
@@ -54,7 +54,10 @@ test('fetches corrected physical pages while preserving damage on untouched page
   assert.equal(page.metadata.status, 'needs-review');
   assert.match(page.text, /视觉转录修订/);
   assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 42 }).text, /h\(x\) ≥ g\(x\)/);
-  assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 43 }).text, /U\+0014/);
+  const automatic = catalog.fetch({ id: item.id, mode: 'reference', start: 43, count: 1 });
+  assert.match(automatic.text, /a ≤ b ≤ 100/);
+  assert.match(automatic.text, /自动提取修复/);
+  assert.equal(automatic.metadata.status, 'needs-review');
   assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 11 }).text, /n × n[\s\S]*1 ≤ n ≤ 8/);
   const dp = catalog.fetch({ id: 'wzj52501-6cc8051f4f4f2148', mode: 'reference', start: 8 });
   assert.match(dp.text, /n ≤ 10\^7/);

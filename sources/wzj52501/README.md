@@ -44,7 +44,13 @@ PDF 采用物理页码，DOCX 采用段落／表格定位，PPTX 采用幻灯片
 
 ## 获取、重建和检查
 
-### 局部转录修订
+### 批量提取修复与局部视觉修订
+
+全部 53 份允许提取的 PDF 都经过字体和可见性修复流程。导入器读取内嵌 CFF 编码补全缺失的 Unicode 映射，保留已有正确映射；对私用区字形使用已核对的字形证据。证据见 `pdf-symbol-evidence.json`，不是按控制码全局猜符号。PDF 原件不改写。
+
+逐文件覆盖、实际视觉抽查和公式结构待办见 [本轮验收记录](../../docs/acceptance-pdf-batch.md)。显式异常清零不代表上下标、分数、图片或样例排版已完整恢复。
+
+不可见文字仅在透明度恰为零、明确不绘制，或水平/轴对齐且整体位于页面之外时过滤，并保留原文字推进位置。未知字体、复杂变换、Form 和其他裁剪情况保留并警告。页内“自动提取修复”不代表逐页视觉审核；上下标、分数、表格、图片等仍可能失真，状态仍为 needs-review。
 
 `corrections.json` 保存按原件页图核对的局部修订，默认由导入命令应用。每项绑定来源 ID、原路径、原件 SHA256、物理页码与原始提取页段 SHA256；哈希不匹配、页码不存在、重复修订或 withheld 来源会拒绝导入。不要直接编辑生成的 `text/`，否则下次重建会覆盖。
 
@@ -52,11 +58,11 @@ PDF 采用物理页码，DOCX 采用段落／表格定位，PPTX 采用幻灯片
 
 已确认的特殊问题：Search 第 41 页的旧提取含隐藏动画文字，估价函数段落实际在第 42 页显示；DP 第 8 页的上标 `10^7` 原先被静默提取成 `107`。bishop-solution.docx 的嵌入公式仍待处理，不能把 PDF 修复泛化为 DOCX 已修复。复核记录见[首批修订记录](../../docs/acceptance-extraction-repair.md)。
 
-如需复现未修订原始结果，使用 Python 导入模块的 `import_archive(archive, output, corrections=[])` 写到单独临时目录；或为 CLI 的 `--corrections` 提供内容为 `[]` 的 JSON 文件。默认修订文件缺失时 CLI 会报错，避免悄悄退回旧正文。
+如需复现最初的原始结果，使用 Python 导入模块的 `import_archive(archive, output, corrections=[], pdf_repairs=False)` 写到单独临时目录。CLI 的 `--corrections` 指向 `[]` 仅停用视觉修订，仍执行自动修复。默认修订文件缺失时 CLI 会报错，避免悄悄退回旧正文。旧视觉修订的哈希始终按自动修复之前的原始提取校验。
 
 ### 重建命令
 
-查询已提交的转录不需要 Python、PDF 解析器或 GitHub CLI；维护者重建时使用 Python 3.12+ 和 `scripts/requirements-library.txt` 中的 pypdf，DOCX/PPTX 处理使用 Python 标准库。脚本只读源文件，不编译或执行上游代码。
+查询已提交的转录不需要 Python、PDF 解析器或 GitHub CLI；维护者重建时使用 Python 3.12+ 和 `scripts/requirements-library.txt` 中固定版本的 pypdf、fontTools，DOCX/PPTX 处理使用 Python 标准库。脚本只读源文件，不编译或执行上游代码。
 
 ```powershell
 python -m pip install -r scripts/requirements-library.txt
@@ -64,7 +70,8 @@ python scripts/import-library.py --help
 python scripts/import-library.py fetch
 python scripts/import-library.py import
 npm run validate:library
-python -m unittest discover -s tests -p 'test_import_library.py'
+python -m unittest discover -s tests -p 'test_*.py'
+python scripts/audit-pdf-extraction.py
 ```
 
 在仓库根目录执行，默认缓存位于忽略的 `.cache/library/`，正文和清单位于本目录。也可以通过导入命令的 `--archive` 指定已经获取的固定 ZIP。原始二进制文件不提交进 exp；核对原图时按清单固定链接获取。
