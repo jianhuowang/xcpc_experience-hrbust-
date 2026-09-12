@@ -45,7 +45,7 @@ test('H1/H2 never return bodies and reference cannot expose solutions', () => {
   assert.equal(result.metadata.direct_solution, true);
 });
 
-test('fetches corrected physical pages while preserving damage on untouched pages', () => {
+test('fetches visual and automatic repairs without promoting review status', () => {
   const item = catalog.search({ query: 'Search.pdf', scope: 'external' }).results[0];
   const page = catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 41, count: 1 });
   assert.match(page.metadata.location, /物理页 41/);
@@ -54,12 +54,56 @@ test('fetches corrected physical pages while preserving damage on untouched page
   assert.equal(page.metadata.status, 'needs-review');
   assert.match(page.text, /视觉转录修订/);
   assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 42 }).text, /h\(x\) ≥ g\(x\)/);
-  assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 43 }).text, /U\+0014/);
+  const fractions = catalog.fetch({ id: item.id, mode: 'reference', start: 43, count: 1 });
+  assert.match(fractions.text, /19\/45 = 1\/5 \+ 1\/6 \+ 1\/18/);
+  assert.match(fractions.text, /a ≤ b ≤ 100/);
+  assert.match(fractions.text, /视觉转录修订/);
+  const automatic = catalog.fetch({ id: item.id, mode: 'reference', start: 20, count: 1 });
+  assert.match(automatic.text, /自动提取修复/);
+  assert.equal(automatic.metadata.status, 'needs-review');
   assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 11 }).text, /n × n[\s\S]*1 ≤ n ≤ 8/);
   const dp = catalog.fetch({ id: 'wzj52501-6cc8051f4f4f2148', mode: 'reference', start: 8 });
   assert.match(dp.text, /n ≤ 10\^7/);
+  const recurrence = catalog.fetch({ id: dp.metadata.id, mode: 'reference', start: 9, count: 1 });
+  assert.match(recurrence.text, /f_i = f_\{i-1\} \+ f_\{i-2\} \+ f_\{i-3\}/);
+  assert.doesNotMatch(recurrence.text, /f_0/); // 初始条件只在下一张动画页出现。
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'line' }), /invalid_argument/);
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 1, count: 6 }), /invalid_argument/);
+});
+
+test('recovered destiny samples retain page boundaries and satisfy the statement', () => {
+  const fetchPage = (start) => catalog.fetch({ id: 'wzj52501-9efd5abc5b968d9c', mode: 'H3', start, count: 1 }).text;
+  const page3 = fetchPage(3), page4 = fetchPage(4);
+  const numericLines = (text) => text.split('\n').filter((line) => /^\d+(?: \d+)*$/.test(line));
+  const first = numericLines(page3.split('【样例 1 输入】')[1].split('【样例 1 输出】')[0]);
+  const secondHead = numericLines(page3.split('【样例 2 输入】')[1]);
+  const secondTail = numericLines(page4.split('【样例 2 输出】')[0]);
+  assert.equal(first.length, 7);
+  assert.equal(secondHead.length, 6);
+  assert.equal(secondTail.length, 16);
+  // 独立枚举每条边是否重要，检查每个约束路径至少含一条重要边。
+  for (const [lines, expected] of [[first, 8], [[...secondHead, ...secondTail], 960]]) {
+    const rows = lines.map((line) => line.split(' ').map(Number)), n = rows[0][0];
+    const graph = Array.from({ length: n + 1 }, () => []);
+    for (let i = 1; i < n; i++) {
+      const [a, b] = rows[i];
+      graph[a].push([b, 1 << (i - 1)]);
+      graph[b].push([a, 1 << (i - 1)]);
+    }
+    const paths = Array(n + 1);
+    const visit = (v, parent, bits) => {
+      paths[v] = bits;
+      for (const [u, bit] of graph[v]) if (u !== parent) visit(u, v, bits | bit);
+    };
+    visit(1, 0, 0);
+    assert.equal(rows.length, n + 1 + rows[n][0]);
+    const constraints = rows.slice(n + 1).map(([a, b]) => paths[a] ^ paths[b]);
+    let count = 0;
+    for (let mask = 0; mask < 2 ** (n - 1); mask++) {
+      if (constraints.every((path) => (path & mask) !== 0)) count++;
+    }
+    assert.equal(count, expected);
+  }
 });
 
 test('fetches the requested physical statement pages only', () => {

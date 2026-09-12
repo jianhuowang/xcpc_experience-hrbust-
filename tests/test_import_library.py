@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import stat
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -12,6 +13,7 @@ import zipfile
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/import-library.py"
+sys.path.insert(0, str(SCRIPT.parent))
 ROOT = "awesome-competitive-olympiad-algorithms-7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/"
 
 

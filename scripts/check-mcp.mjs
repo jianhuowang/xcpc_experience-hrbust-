@@ -31,7 +31,7 @@ export async function checkMcp(url) {
     assert.equal(lecture.metadata.status, 'needs-review');
     assert.match(lecture.metadata.location, /物理页 41/);
     assert.match((await call('fetch', { id, mode: 'reference', start: 42 })).text, /h\(x\) ≥ g\(x\)/);
-    assert.match((await call('fetch', { id, mode: 'reference', start: 43 })).text, /U\+0014/);
+    assert.match((await call('fetch', { id, mode: 'reference', start: 43 })).text, /a ≤ b ≤ 100/);
     const sources = [];
     for (const args of [
       { id: 'wzj52501-e2940294a8c44755', unit: 'paragraph', start: 1, count: 4 },

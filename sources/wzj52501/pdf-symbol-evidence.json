@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "upstream_commit": "7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e",
+  "checked_on": "2026-09-12",
+  "attribution": "wzj52501（上游仓库维护者；原文署名与CC-BY-NC-SA-4.0许可保留）；此文件记录字形转录证据，不代表算法审核。",
+  "method": "先检查原PDF内嵌字体及ToUnicode，再由Poppler渲染所列visual_pages核实字形；TT字形哈希为fontTools4.65 RecordingPen.value的repr UTF-8 SHA-256。相同字形的哈希在所有所列字体中一致，包括匿名CIDFont+F5。没有依据公式语义补符号。",
+  "limitations": [
+    "仅替换映射到单个PUA的已知字形，不覆盖正确Unicode。",
+    "仅支持ToUnicode的bfchar；bfrange等未处理映射保留并报告。",
+    "TT要求Identity-H和CIDToGIDMap Identity；其他编码保持原值。",
+    "CFF使用无显式PDF Encoding覆盖的内嵌Encoding字形名。",
+    "先处理可见范围；不合并大括号分段，不去重连续省略号，不恢复公式布局、上下标或求和上下限。"
+  ],
+  "symbol_mappings": [
+    {
+      "from": "U+F02B",
+      "to": "+",
+      "unicode_name": "PLUS SIGN",
+      "outline_sha256": "0f8b639cdf2aa950a084ad790591bc8dbee08da9ccbf04ea98ccc9fb3ab3e030"
+    },
+    {
+      "from": "U+F02D",
+      "to": "−",
+      "unicode_name": "MINUS SIGN",
+      "outline_sha256": "462f7c2c2aa5908280831855a8c2819ed551b77a391bd8a8f6b63fb99719e379"
+    },
+    {
+      "from": "U+F03D",
+      "to": "=",
+      "unicode_name": "EQUALS SIGN",
+      "outline_sha256": "6dffc7104be2093ed776d02c946c75a8e56a7ce568adfbf783d604f2e1caa5f3"
+    },
+    {
+      "from": "U+F0A3",
+      "to": "≤",
+      "unicode_name": "LESS-THAN OR EQUAL TO",
+      "outline_sha256": "da23d4b11612604982de0573319a9029be072878cbdca4223d396df38275b402"
+    },
+    {
+      "from": "U+F0B4",
+      "to": "×",
+      "unicode_name": "MULTIPLICATION SIGN",
+      "outline_sha256": "904a605833772dc9dbd16dca4169ee7061f442e189497904ff5f104f29d786e0"
+    },
+    {
+      "from": "U+F0B9",
+      "to": "≠",
+      "unicode_name": "NOT EQUAL TO",
+      "outline_sha256": "9e119343364a70c9acfa3def85161b1ad0921fa0e94228927457a8ffac5e17df"
+    },
+    {
+      "from": "U+F0BC",
+      "to": "…",
+      "unicode_name": "HORIZONTAL ELLIPSIS",
+      "outline_sha256": "7054b82e8e252dc538451222a0494a55f5d0a8bb80cae3910c60e75f225b720a"
+    },
+    {
+      "from": "U+F0E5",
+      "to": "∑",
+      "unicode_name": "N-ARY SUMMATION",
+      "outline_sha256": "6419051da0bf5b3908e408445069ed0098908b2dc0a4ec3fe81f6da650f552e3"
+    }
+  ],
+  "brace_mappings": [
+    {
+      "from": "U+F8F1",
+      "to": "⎧",
+      "glyph_name": "bracelefttp",
+      "unicode_name": "LEFT CURLY BRACKET UPPER HOOK"
+    },
+    {
+      "from": "U+F8F2",
+      "to": "⎨",
+      "glyph_name": "braceleftmid",
+      "unicode_name": "LEFT CURLY BRACKET MIDDLE PIECE"
+    },
+    {
+      "from": "U+F8F3",
+      "to": "⎩",
+      "glyph_name": "braceleftbt",
+      "unicode_name": "LEFT CURLY BRACKET LOWER HOOK"
+    }
+  ],
+  "sources": [
+    {
+      "id": "wzj52501-6cc8051f4f4f2148",
+      "path": "Lectures/Dynamic-Programming.pdf",
+      "sha256": "620742d7361eefd995478ba399c6c19d29556c28b069d9a864553cf992efa222",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Dynamic-Programming.pdf",
+      "font_checked_pages": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "visual_pages": [
+        27
+      ]
+    },
+    {
+      "id": "wzj52501-56f28959e9c51d43",
+      "path": "Lectures/NOIP-Dynamic-Programming.pdf",
+      "sha256": "665d6f6d34ba220dd56cb3362992363252b8ed2ddb98b1f15b668aa5a6b49278",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/NOIP-Dynamic-Programming.pdf",
+      "font_checked_pages": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "visual_pages": []
+    },
+    {
+      "id": "wzj52501-16fe3700cac34333",
+      "path": "Setter/NOI/Mock-1/statements.pdf",
+      "sha256": "26ac320b6ed63dbfd957f455ba945d137a96461cac46977da9dc341ab68b39ef",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Mock-1/statements.pdf",
+      "font_checked_pages": [
+        3
+      ],
+      "visual_pages": []
+    },
+    {
+      "id": "wzj52501-4e18433faccd539f",
+      "path": "Setter/NOI/Mock-2/statements.pdf",
+      "sha256": "aaf0f89c4ca4a639ca04c020f389612d87dd21b3ba0a463dc3e6a848d24a0cf9",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Mock-2/statements.pdf",
+      "font_checked_pages": [
+        2,
+        3,
+        4
+      ],
+      "visual_pages": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "wzj52501-1722249f1bebd56c",
+      "path": "Setter/NOI/Mock-3/statements.pdf",
+      "sha256": "0bb46ac4caf21145252c1742f3359ef05dfb6edc81a3e12b6f177434f4932314",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Mock-3/statements.pdf",
+      "font_checked_pages": [
+        3
+      ],
+      "visual_pages": [
+        3
+      ]
+    },
+    {
+      "id": "wzj52501-a1d38690b886c1b3",
+      "path": "Setter/NOI/Mock-4/statements.pdf",
+      "sha256": "dcfa0c647b752e656a1a7b4b31b9599da3bf0e5c59ee57e3d18f2cfa9898aeb6",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Mock-4/statements.pdf",
+      "font_checked_pages": [
+        3,
+        4
+      ],
+      "visual_pages": [
+        3
+      ]
+    },
+    {
+      "id": "wzj52501-bd625520387cf014",
+      "path": "Setter/NOI/Mock-4/zoo-solution.pdf",
+      "sha256": "ab7a4eadb2a063ff4b839595017efda24d3bd15e7d538098127516960191b415",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Mock-4/zoo-solution.pdf",
+      "font_checked_pages": [
+        1
+      ],
+      "visual_pages": []
+    },
+    {
+      "id": "wzj52501-0f316880abbe14e4",
+      "path": "Setter/NOI/Practice-2/statements.pdf",
+      "sha256": "6cbb7d2eed303ccea7be6e348cda962f288992dce27a5b4445e3e4eb5b5d9e40",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/Practice-2/statements.pdf",
+      "font_checked_pages": [
+        3
+      ],
+      "visual_pages": [
+        3
+      ]
+    },
+    {
+      "id": "wzj52501-d4129b2b66575288",
+      "path": "Setter/NOIP/Mock-3/statements.pdf",
+      "sha256": "e6235dc7254c777480d0b1d98dd2a72ea60ff7a74890b0a91b3084798b9ff272",
+      "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOIP/Mock-3/statements.pdf",
+      "font_checked_pages": [
+        2
+      ],
+      "visual_pages": []
+    }
+  ],
+  "cff_font_mappings": {
+    "f12ae540c9daaa3311e98150e95fd68a0e6585a30f48c8a189dc9c6f7eacab02": {
+      "a0": "╮",
+      "a1": "╯",
+      "a2": "╰",
+      "a3": "╭"
+    },
+    "ddeb22f11eb8b556b3cd072a83b70717fa8d118156a2add15f9c3e7dd189c203": {
+      "a0": "╮",
+      "a1": "╯",
+      "a2": "╰",
+      "a3": "╭"
+    },
+    "b3df8d7803a998378bd5715e38abdbeacda27c5bbdf53abc1f35d7a1c7fce187": {
+      "a0": "╮",
+      "a1": "╯",
+      "a2": "╰",
+      "a3": "╭"
+    }
+  },
+  "cff_corner_evidence": {
+    "method": "2026-09-12 用Poppler完整检查下列6页，并以600dpi放大destiny物理页3第一个样例框四角。LCIRCLE10 CFF Encoding为0→a0,1→a1,2→a2,3→a3；a3在左上、a0在右上、a2在左下、a1在右下。四字形轮廓分别是相应方向的四分之一圆弧；使用标准圆角框线╭╮╰╯转录。三份CFF文件哈希不同，逐字形轮廓相同。",
+    "meaning": "仅为样例框绘图部件，不是题意或数学符号；文本转录保留圆角字符，不宣称重建整条边框。a0等名称本身不构成证据，必须同时匹配内嵌字体SHA-256。",
+    "sources": [
+      {
+        "id": "wzj52501-9efd5abc5b968d9c",
+        "path": "Setter/NOI/noi2020-final/destiny.pdf",
+        "sha256": "2ab6977197798e925f5430dd0a5a4f283dde2258ffbc654f7dd8b5cd8a1753ee",
+        "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/noi2020-final/destiny.pdf",
+        "visual_pages": [
+          3,
+          4
+        ],
+        "font_sha256": "f12ae540c9daaa3311e98150e95fd68a0e6585a30f48c8a189dc9c6f7eacab02"
+      },
+      {
+        "id": "wzj52501-ba5ceed59ea76659",
+        "path": "Setter/NOI/noi2020-final/problem.pdf",
+        "sha256": "a769d576e1d24bbf422e657f711f52c09b6c5cd1cb4ba3fa3ef35e90bc333f21",
+        "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/noi2020-final/problem.pdf",
+        "visual_pages": [
+          2,
+          3
+        ],
+        "font_sha256": "ddeb22f11eb8b556b3cd072a83b70717fa8d118156a2add15f9c3e7dd189c203"
+      },
+      {
+        "id": "wzj52501-82e627ac1cb17bc8",
+        "path": "Setter/NOI/noi2020-final/surreal.pdf",
+        "sha256": "efe1a1cda3615576268ffaf7bb4779bfeef2cfeb656aee7733471c4d80f8ef41",
+        "source_url": "https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/NOI/noi2020-final/surreal.pdf",
+        "visual_pages": [
+          5,
+          6
+        ],
+        "font_sha256": "b3df8d7803a998378bd5715e38abdbeacda27c5bbdf53abc1f35d7a1c7fce187"
+      }
+    ]
+  }
+}
