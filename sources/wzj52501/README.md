@@ -56,6 +56,8 @@ PDF 采用物理页码，DOCX 采用段落／表格定位，PPTX 采用幻灯片
 
 首批为 Search.pdf 第 11、41、42 页与 Dynamic-Programming.pdf 第 8 页。页内标注“视觉转录修订”，清单保留 needs-review。修订是 Codex 对原页的转录，需随 PR 审核；不是协会算法审核，也没有全库 OCR。未修页不因相邻页修复而自动成为可信正文。
 
+第二批补充 18 页：Search.pdf 第 43–48 页的分数和剪枝公式；Dynamic-Programming.pdf 第 9–15、23、28 页的指数、下标和递推；destiny.pdf 第 3–5 页的样例与子任务表。累计 22 页有视觉修订，均经过独立原图复核。Search 的原文变量歧义保留为编者待核说明；DP 第 12–15 页明确以首尾不相邻为假设，不能当作环形问题的完整解法。destiny 样例 2 仍按原物理页拆分，复制完整输入需取第 3、4 页。
+
 已确认的特殊问题：Search 第 41 页的旧提取含隐藏动画文字，估价函数段落实际在第 42 页显示；DP 第 8 页的上标 `10^7` 原先被静默提取成 `107`。bishop-solution.docx 的嵌入公式仍待处理，不能把 PDF 修复泛化为 DOCX 已修复。复核记录见[首批修订记录](../../docs/acceptance-extraction-repair.md)。
 
 如需复现最初的原始结果，使用 Python 导入模块的 `import_archive(archive, output, corrections=[], pdf_repairs=False)` 写到单独临时目录。CLI 的 `--corrections` 指向 `[]` 仅停用视觉修订，仍执行自动修复。默认修订文件缺失时 CLI 会报错，避免悄悄退回旧正文。旧视觉修订的哈希始终按自动修复之前的原始提取校验。
