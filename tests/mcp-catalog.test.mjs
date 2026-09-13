@@ -58,7 +58,7 @@ test('fetches visual and automatic repairs without promoting review status', () 
   assert.match(fractions.text, /19\/45 = 1\/5 \+ 1\/6 \+ 1\/18/);
   assert.match(fractions.text, /a ≤ b ≤ 100/);
   assert.match(fractions.text, /视觉转录修订/);
-  const automatic = catalog.fetch({ id: item.id, mode: 'reference', start: 20, count: 1 });
+  const automatic = catalog.fetch({ id: item.id, mode: 'reference', start: 22, count: 1 });
   assert.match(automatic.text, /自动提取修复/);
   assert.equal(automatic.metadata.status, 'needs-review');
   assert.match(catalog.fetch({ id: item.id, mode: 'reference', start: 11 }).text, /n × n[\s\S]*1 ≤ n ≤ 8/);
@@ -69,6 +69,21 @@ test('fetches visual and automatic repairs without promoting review status', () 
   assert.doesNotMatch(recurrence.text, /f_0/); // 初始条件只在下一张动画页出现。
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'line' }), /invalid_argument/);
   assert.throws(() => catalog.fetch({ id: item.id, mode: 'H3', unit: 'page', start: 1, count: 6 }), /invalid_argument/);
+});
+
+test('visual formulas preserve source errors and exclude unverifiable off-page bounds', () => {
+  const dpPage = (start) => catalog.fetch({ id: 'wzj52501-6cc8051f4f4f2148', mode: 'reference', start, count: 1 }).text;
+  const turtle = dpPage(18);
+  assert.match(turtle, /b_1 \+ 2b_2 \+ 3b_3 \+ 4b_4 = n \+ 1/);
+  assert.match(turtle, /编者待核说明[\s\S]*n−1[\s\S]*独立检查/);
+  assert.doesNotMatch(dpPage(29), /f_n =/);
+  assert.match(dpPage(30), /f_n = f_\{n-1\} \+ f_\{n-2\} \+ 1/);
+  assert.match(dpPage(104), /k\^2[\s\S]*1 ≤ n ≤ 10\^5/);
+  assert.match(dpPage(89), /没有能够核实的数据范围行/);
+  assert.doesNotMatch(dpPage(89), /100000|200000|k ≤ 50|p ≤/);
+  const selection = catalog.fetch({ id: 'wzj52501-0f0daa9b82cfef46', mode: 'reference', start: 20, count: 1 }).text;
+  assert.match(selection, /1 ≤ x_i ≤ 10\^6/);
+  assert.doesNotMatch(selection, /搜索出所有可能的和后/);
 });
 
 test('recovered destiny samples retain page boundaries and satisfy the statement', () => {

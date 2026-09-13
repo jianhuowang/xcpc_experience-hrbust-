@@ -1,8 +1,8 @@
 # 全部标注 PDF：字符与可见性修复验收
 
-日期：2026-09-12。比较基线为 PR #14 的 `bc23e38`；固定原件快照为 `7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e`。
+更新：2026-09-13。比较基线为 PR #14 的 `bc23e38`；固定原件快照为 `7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e`。
 
-本轮处理全部 53 份允许提取的 PDF、1834 物理页；13 份 withheld PDF 保持仅元数据。首轮自动提取变化覆盖 1762 页，保留 4 页视觉修订；第二轮又将其中 18 页完成视觉修订，当前为 1744 页自动修复、22 页视觉修订。显式异常从 870 页降至 0 页。
+本轮处理全部 53 份允许提取的 PDF、1834 物理页；13 份 withheld PDF 保持仅元数据。首轮自动提取变化覆盖 1762 页，保留 4 页视觉修订；第二轮又将其中 18 页完成视觉修订，第三轮再补 14 页，当前为 1730 页自动修复、36 页视觉修订。显式异常从 870 页降至 0 页。
 
 **这是字符编码与可见性修复的全库覆盖，不是全部公式或全部页面已审核。** 所有 PDF 仍为 needs-review；没有逐页 OCR，也没有生成算法题解。
 
@@ -12,7 +12,7 @@
 - 私用区符号按内嵌 TT 字形轮廓哈希恢复；三段大括号按原 CFF 字形名恢复。九份原件中 18 页、91 个 PUA 在独立回归中全部恢复。
 - 三份题面的 48 个 LCIRCLE 圆角按内嵌字体 SHA256 和字形名恢复为 ╭╮╰╯，仅表示样例框线，不是数学字符。
 - 透明度恰为零、不绘制及确定页外文字从提取副本排除，保留原文本推进；旋转、描边、未知字体、Form 和其他裁剪情况保留并警告。
-- 原 PDF 字节不修改。来源 ID、原件哈希、物理页、许可和 needs-review 状态保留；22 页 Codex 视觉转录均先按原始 pypdf 页段哈希核验后应用。
+- 原 PDF 字节不修改。来源 ID、原件哈希、物理页、许可和 needs-review 状态保留；36 页 Codex 视觉转录均先按原始 pypdf 页段哈希核验后应用。
 
 字形依据、固定链接、核查页和署名见 [字形证据](../sources/wzj52501/pdf-symbol-evidence.json)。解析器接口参考 [fontTools CFF 文档](https://fonttools.readthedocs.io/en/latest/cffLib/index.html)。
 
@@ -21,7 +21,7 @@
 - 独立代码审查两轮未发现有证据的 P1/P2。字体、可见性、原始页段哈希校验均有回归。
 - 额外实际渲染比对 Geometry 34、Graph-Misc 38、Number-Theory 59、NOIP-Preparation 5、NOI/Mock-1 solutions 30；大量删除的后续文字确实不在这些原页可见区域，无可见算法正文误删。root 另核对 Search 48 与 destiny 3。
 - Search 41/42、DP 8 的真实原件本地回归验证隐藏段落边界；CI 不携带上游二进制，真实原件两项在 CI 跳过，合成边界测试仍运行。
-- 本地 Python 27 项测试：26 通过，1 项 Windows 符号链接测试跳过。Node 46 项通过，包含官方 MCP SDK 的真实本地 HTTP 调用；5 条协会知识与 135 条外部来源校验通过。
+- 本地 Python 27 项测试：26 通过，1 项 Windows 符号链接测试跳过。Node 47 项通过，包含官方 MCP SDK 的真实本地 HTTP 调用；5 条协会知识与 135 条外部来源校验通过。
 - 完整重建两次，122 个生成文件逐字节一致；所有非 PDF 转录与基线一致。未声称网页线上版本已更新。
 
 ## 第二轮：数学转录与样例
@@ -37,6 +37,17 @@
 新增回归先在旧正文上失败，再在修订正文上通过。测试从 MCP 返回的真实页段取得两组 destiny 输入，独立枚举边的所有 0/1 赋值，检查每个约束路径至少有一条重要边，分别得到原样例答案 8 和 960；这也防止行号重新混入输入。Search 两个分数等式另用有理数运算核对。上述检查不等于全题算法或整份讲义已验证。
 
 固定链接与完整来源 ID 见下方逐文件表；原件及旧页段哈希、逐页转录和核对理由保存在 `sources/wzj52501/corrections.json`。
+
+## 第三轮：相邻例题与剩余上标候选
+
+新增 Search 第 20–21 页及 DP 第 16–19、29–31、58、89、104、107、115 页，共 14 页。所有候选均逐页查看原图并交叉复核；复核发现第 89 页一处无意改写，已恢复为原文“所要花的时间”。
+
+- Search 恢复 `x_i` 和 `10^6`，最后一句仍仅在第 21 页出现。
+- DP 补全环形例题的首尾拆分说明、树高递推的下标与 `10^18`，以及其他候选页的 `k^2`、`10^9`、`10^4`、`10^5`。
+- 乌龟棋第 18–19 页原式明确为 `n+1`，但题意写从第 1 格到第 n 格。原式保留，另标编者独立位移检查 `n−1`，不把原讲义矛盾当作转录错误偷偷改掉。
+- 第 89 页数据范围在可见原页中无法核实，不从旧提取补入；正文明确说明缺失。该页的范围问题仍未解决。
+
+新增 MCP 回归保护原式与编者说明分离、树高递推的动画页边界、平方代价和不可见约束排除。本轮清单中的 Search/DP 上标候选页已逐项核对，但这不是两份讲义全部页面或全部公式的完整审核。
 
 ## 未完成项与下一批
 
@@ -57,7 +68,7 @@
 | `wzj52501-57b750702384943e`<br>[Lectures/Computational-Geometry.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Computational-Geometry.pdf) | 81 | 81 | 56 → 0 | 58, 59, 60, 61, 62, 66, 67, 71, 72, 73, 74, 75, 76, 77, 78, 79 |
 | `wzj52501-14c1aebd385d0898`<br>[Lectures/Data-Structures.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Data-Structures.pdf) | 102 | 102 | 47 → 0 | 14, 15, 16, 17, 18, 19, 20, 21, 27, 28, 29, 30, 31, 32, 33, 46, 61, 62, 63, 68, 72, 77, 78, 79, 84, 85, 87, 88, 89, 90, 91, 97, 98, 99, 100, 101 |
 | `wzj52501-bef09e38cffed149`<br>[Lectures/Dynamic-Programming-Talk.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Dynamic-Programming-Talk.pdf) | 66 | 66 | 46 → 0 | 4, 5, 6, 7, 8, 9, 10, 11, 12, 34, 56 |
-| `wzj52501-6cc8051f4f4f2148`<br>[Lectures/Dynamic-Programming.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Dynamic-Programming.pdf) | 120 | 110 | 21 → 0 | 29, 30, 31, 58, 89, 104, 107, 115 |
+| `wzj52501-6cc8051f4f4f2148`<br>[Lectures/Dynamic-Programming.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Dynamic-Programming.pdf) | 120 | 98 | 21 → 0 | 候选均已核对；89 页范围仍无法确认 |
 | `wzj52501-8032cd13a26e9252`<br>[Lectures/Graph-Fun-Problems.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Graph-Fun-Problems.pdf) | 11 | 11 | 1 → 0 | 未检出；不代表没有上下标 |
 | `wzj52501-8beb95e45226db3c`<br>[Lectures/Graph-Misc-Problems.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Graph-Misc-Problems.pdf) | 71 | 71 | 46 → 0 | 12, 13, 14, 15, 16, 17, 25, 26, 44, 51, 56, 62 |
 | `wzj52501-78defa026b502528`<br>[Lectures/Graph-Theory-and-Applications.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Graph-Theory-and-Applications.pdf) | 142 | 142 | 65 → 0 | 54, 55, 56, 57, 58, 59, 60, 116, 124, 125, 130, 137 |
@@ -69,7 +80,7 @@
 | `wzj52501-56daca84def58c58`<br>[Lectures/Number-Theory.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Number-Theory.pdf) | 65 | 65 | 39 → 0 | 34, 35, 36, 37, 53, 54, 55, 56 |
 | `wzj52501-230181316075b1b5`<br>[Lectures/Rare-Tricks.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Rare-Tricks.pdf) | 64 | 64 | 36 → 0 | 6, 15, 23, 50, 51, 52, 53, 54, 55, 56 |
 | `wzj52501-2fd4e11ab81b2b16`<br>[Lectures/STL-and-Applications.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/STL-and-Applications.pdf) | 67 | 67 | 19 → 0 | 28, 29, 30, 31, 32 |
-| `wzj52501-0f0daa9b82cfef46`<br>[Lectures/Search.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Search.pdf) | 52 | 43 | 12 → 0 | 20, 21 |
+| `wzj52501-0f0daa9b82cfef46`<br>[Lectures/Search.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Search.pdf) | 52 | 41 | 12 → 0 | 候选均已核对；其余公式仍待核对 |
 | `wzj52501-26bc66f176222b6e`<br>[Lectures/Strategy.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Lectures/Strategy.pdf) | 49 | 49 | 43 → 0 | 4, 5, 6, 7, 8, 9, 17, 21, 27, 38, 44 |
 | `wzj52501-9d0fc4ce42a7447e`<br>[Setter/BJTSC/Day1/solutions.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/BJTSC/Day1/solutions.pdf) | 46 | 46 | 23 → 0 | 6, 7, 8 |
 | `wzj52501-71f6afeeedcb238c`<br>[Setter/BJTSC/Day1/statements.pdf](https://github.com/wzj52501/awesome-competitive-olympiad-algorithms/blob/7b7a50a271b4a0773e1e046411fbd5bcb3c1f28e/Setter/BJTSC/Day1/statements.pdf) | 7 | 0 | 0 → 0 | 3, 5, 7 |
