@@ -38,7 +38,7 @@ export function createMcpServer(catalog, instructions) {
   }, call('search'));
   server.registerTool('fetch', {
     title: '按稳定 ID 读取 XCPC 资料页段',
-    description: '仅接受 search 返回的稳定 ID，不接受路径或下载地址。PDF 用物理页 page、PPTX 用 slide、DOCX 用 paragraph/table、代码与 Markdown 用原始行 line。H1/H2 只返回元数据；reference 可读通用讲义与协会经验；题面、直接题解及代码只允许明确 H3。每份采用的来源分别引用 ID、完整固定 URL、定位和状态。',
+    description: '仅接受 search 返回的稳定 ID，不接受路径或下载地址。H1/H2 只返回元数据，调用时只传 id、mode，不传 unit/start/count。正文读取：PDF 用物理页 page、PPTX 用 slide、DOCX 用 paragraph/table、代码与 Markdown 用原始行 line。reference 可读通用讲义与协会经验；题面、直接题解及代码只允许明确 H3。每份采用的来源分别引用 ID、完整固定 URL、定位和状态。',
     inputSchema: z.object({
       id: z.string().min(1).max(160), mode,
       unit: z.enum(['page', 'slide', 'paragraph', 'table', 'line']).optional(),
@@ -50,7 +50,7 @@ export function createMcpServer(catalog, instructions) {
   }, call('fetch'));
   server.registerTool('contribution_guide', {
     title: '读取 EXP 投稿 Schema、模板与投稿流程',
-    description: '用户想整理经验、按 Schema 起草、修改旧条目或准备 PR 时先调用。完整返回当前固定版本的真实 Schema（含模板及收录门槛）、Skill 投稿流程、PR 模板和目标目录。无需题号，不读取题解，不升级 H1/H2。只读，不创建文件或 PR；无法取到规则时明确失败，禁止猜造字段。',
+    description: '用户想整理经验、按 Schema 起草、修改旧条目或准备 PR 时先调用。完整返回当前固定版本的真实 Schema（含模板及收录门槛）、Skill 投稿流程、PR 模板和目标目录。Agent 只做第一层初筛，最终由 PR 人工审核。按 Schema 区分模拟材料、用户自述和已核实证据；模拟草稿不可直接入库，不夸大因果或证据等级。无需题号，不读取题解，不升级 H1/H2。只读，不创建文件或 PR；无法取到规则时明确失败，禁止猜造字段。',
     inputSchema: z.object({}).strict(),
     outputSchema: z.object({ knowledge_revision: z.string(), submission_directory: z.string(), note: z.string(),
       documents: z.array(z.object({ title: z.string(), path: z.string(), url: z.string(), text: z.string() })) }),
