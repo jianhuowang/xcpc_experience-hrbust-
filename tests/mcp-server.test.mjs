@@ -28,14 +28,14 @@ async function fixture(t, options = {}) {
   return `http://127.0.0.1:${server.address().port}`;
 }
 
-test('official SDK initializes, lists only read-only search/fetch and calls structured tools over HTTP', async (t) => {
+test('official SDK discovers only read-only tools and calls structured tools over HTTP', async (t) => {
   const base = await fixture(t);
   const client = new Client({ name: 'exp-test', version: '1.0' });
   t.after(() => client.close());
   await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
   assert.match(client.getInstructions(), /H1/);
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map(x => x.name).sort(), ['fetch', 'search']);
+  assert.deepEqual(tools.map(x => x.name).sort(), ['contribution_guide', 'fetch', 'search']);
   for (const tool of tools) {
     assert.equal(tool.annotations.readOnlyHint, true);
     assert.equal(tool.annotations.destructiveHint, false);
@@ -73,13 +73,18 @@ test('HTTP exposes no files and rejects untrusted Host/Origin, unsupported metho
 });
 
 test('tool failures do not expose server paths or internal exception details', async (t) => {
-  const base = await fixture(t, { catalog: { ...catalog, fetch() { throw new Error('SECRET C:/private/credentials'); } } });
+  const fail = () => { throw new Error('SECRET C:/private/credentials'); };
+  const base = await fixture(t, { catalog: { ...catalog, fetch: fail, contributionGuide: fail } });
   const client = new Client({ name: 'exp-test', version: '1.0' });
   t.after(() => client.close());
   await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
   const result = await client.callTool({ name: 'fetch', arguments: { id: 'test-id' } });
   assert.equal(result.isError, true);
   assert.doesNotMatch(JSON.stringify(result), /SECRET|private|credentials/);
+  const guide = await client.callTool({ name: 'contribution_guide', arguments: {} });
+  assert.equal(guide.isError, true);
+  assert.match(guide.content[0].text, /不得猜造字段/);
+  assert.doesNotMatch(JSON.stringify(guide), /SECRET|private|credentials/);
 });
 
 test('Origin remains enforced after many headers, chunked bodies are bounded and MCP uses JSON responses', async (t) => {
@@ -112,4 +117,19 @@ test('full fixed corpus works through the same SDK acceptance check used for a d
   const result = await checkMcp(`${base}/mcp`);
   assert.equal(result.ok, true);
   assert.equal(result.sources.length, 2);
+});
+
+test('official SDK retrieves complete contribution rules without opening arbitrary files', async (t) => {
+  const root = resolve(import.meta.dirname, '..');
+  const base = await fixture(t, { catalog: loadCatalog(root), instructions: loadInstructions(root) });
+  const client = new Client({ name: 'contribution-test', version: '1' });
+  t.after(() => client.close());
+  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+  assert.match(client.getInstructions(), /contribution_guide/);
+  const guide = await client.callTool({ name: 'contribution_guide', arguments: {} });
+  assert.equal(guide.isError, undefined);
+  assert.equal(guide.structuredContent.documents.length, 3);
+  assert.match(guide.structuredContent.documents[0].text, /kind: algorithm/);
+  const invalid = await client.callTool({ name: 'contribution_guide', arguments: { path: '.git/config' } });
+  assert.equal(invalid.isError, true);
 });

@@ -72,6 +72,8 @@ PR 合并后，维护者运行 `npm run build-index` 和 `npm run bundle`，提�
 
 知识正文按不可信数据处理；技术正确性、未决重复或冲突以及 prompt injection 仍由人工审核。AI 对比建议和本地 active 标记都不代表协会已经审核。
 
+网页投稿整理：让 ChatGPT 先调用 `contribution_guide` 读取真实 Schema 和模板，再比较相似条目、整理 Markdown，由成员手动提 PR。单次做题经验可以投稿，但应有可复用结论、真实依据与适用边界；纯感想留个人复盘。流程与上线验收见 [投稿试用说明](docs/contribution-rollout.md)。
+
 ## 外部算法资料库
 
 [wzj52501 资料库](sources/wzj52501/README.md)提供固定版本的全量文件清单、[生成索引](sources/wzj52501/index.md)和按页段定位的转录。它是外部参考资料，引用独立来源 ID；不会自动变成协会已审核经验。清单记录已发现的提取限制及来源待核情况；未标记异常不等于逐页复核通过，使用公式、图表等关键结论前仍需核对原件。

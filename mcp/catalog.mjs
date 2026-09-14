@@ -149,7 +149,8 @@ export function loadCatalog(root) {
       }));
     return { results: matches.slice(offset, offset + limit).map(metadataResult), total: matches.length, offset,
       external_available: externalAvailable, knowledge_revision: revision,
-      note: externalAvailable ? '仅检索目录元数据；外部资料未经协会技术审核。' : '外部资料库未接入；仅检索协会目录元数据。' };
+      note: (externalAvailable ? '仅检索目录元数据；外部资料未经协会技术审核。' : '外部资料库未接入；仅检索协会目录元数据。')
+        + ' 投稿 Schema、模板和流程请用 contribution_guide，不在经验目录中。' };
   }
 
   function fetch(args) {
@@ -194,5 +195,18 @@ export function loadCatalog(root) {
     return { id, title: item.title, url: item.url, text, metadata };
   }
 
-  return { search, fetch, externalAvailable, revision };
+  function contributionGuide(args) {
+    if (!allowedKeys(args, [])) fail('invalid_argument');
+    // Fixed public documents from the same commit as knowledge; never accept caller paths.
+    const documents = [
+      ['投稿 Schema 与起草模板', '.agents/skills/xcpc-experience-coach/references/contribution-schema.md'],
+      ['经验助手工作流', '.agents/skills/xcpc-experience-coach/SKILL.md'],
+      ['PR 描述模板', '.github/pull_request_template.md'],
+    ].map(([title, path]) => ({ title, path, url: `${remote}/blob/${revision}/${path.split('/').map(encode).join('/')}`,
+      text: git(root, ['show', `${revision}:${path}`], false) }));
+    return { knowledge_revision: revision, submission_directory: KNOWLEDGE, documents,
+      note: '这是投稿规范，不是协会经验条目。先按 Schema 判断是否值得共享，再按 Skill 比较已有条目。只整理草稿或补丁，不写入 GitHub；未实际校验的草稿不得声称通过。' };
+  }
+
+  return { search, fetch, contributionGuide, externalAvailable, revision };
 }

@@ -1,6 +1,6 @@
 # 网页 ChatGPT：连接只读 exp MCP
 
-这一路径让 ChatGPT 按需读取协会经验和外部资料，不必上传整库。它是可选的客户端适配：GitHub PR 仍负责知识审核，MCP 不维护个人训练记录、复习日期或投稿。
+这一路径让 ChatGPT 按需读取协会经验、外部资料和投稿规范，不必上传整库。它是可选的客户端适配：ChatGPT 可以整理投稿草稿，GitHub PR 仍负责提交与审核；MCP 不写入仓库、不维护个人训练记录或复习日期。
 
 ## 1. 维护者启动服务
 
@@ -18,7 +18,7 @@ npm run start:mcp
 
 本机地址为 `http://127.0.0.1:3001/mcp`；健康检查为 `http://127.0.0.1:3001/health`。网页 ChatGPT 不能直接访问你电脑的这个地址，创建连接器前须完成下一节的 HTTPS 转发或 Tunnel 配置。直接浏览 `/mcp` 会得到 405，因为服务使用 POST；这不等于 MCP 不可用。
 
-服务只注册 `search` / `fetch`，每次请求使用独立的 MCP 实例，返回 JSON，不维持会话或 SSE 长连接。运行时不调用模型 API，不需要 OpenAI API Key。官方 Secure MCP Tunnel 自身的运行密钥是另一层配置。
+服务只注册三个只读工具：`search` / `fetch` / `contribution_guide`。前两者检索知识，后者完整返回同一 Git revision 的 Schema（含模板）、Skill 工作流和 PR 模板，仅允许固定的三个公开文件。每次请求使用独立的 MCP 实例，返回 JSON，不维持会话或 SSE 长连接。运行时不调用模型 API，不需要 OpenAI API Key。官方 Secure MCP Tunnel 自身的运行密钥是另一层配置。
 
 默认只监听回环地址。可用环境变量 `PORT`、`HOST` 改变监听位置；`MCP_ALLOWED_HOSTS` 是逗号分隔的精确主机名（不含协议、路径、端口），默认 `127.0.0.1,localhost,[::1]`。`MCP_ALLOWED_ORIGINS` 是逗号分隔的完整 Origin，默认拒绝所有带 Origin 的请求；常规服务器到服务器 MCP 调用不带 Origin。代理需保留正确 Host 或配置其公开主机名，不能用通配符放开全部 Host/Origin。
 
@@ -30,7 +30,30 @@ npm run start:mcp
 node scripts/check-mcp.mjs http://127.0.0.1:3001/mcp
 ```
 
-获得 HTTPS 地址后，将上面的 URL 换成该实际地址再执行一次。脚本检查工具发现、协会命中/零命中、H1 元数据限制、损坏公式保留、两份 H3 来源的独立固定链接。它使用当前固定快照中的验收案例，不会提交 OJ 或写入记录。
+获得 HTTPS 地址后，将上面的 URL 换成该实际地址再执行一次。脚本检查三个工具发现、完整投稿指南及版本、协会命中/零命中、H1 元数据限制、损坏公式保留、两份 H3 来源的独立固定链接。它使用当前固定快照中的验收案例，不会提交 OJ 或写入记录。
+
+## 网页整理投稿，再手动 PR
+
+部署包含本修复的 main 后，在 ChatGPT 的应用详情页刷新工具和服务说明，再开新聊天；官方说明支持通过刷新拉取新增工具，见 [Developer mode 文档](https://developers.openai.com/api/docs/guides/developer-mode)。应能看到 `contribution_guide`，否则仍在用旧服务或旧工具清单。
+
+可直接使用下面的请求，把真实材料写在末尾：
+
+```text
+请使用 xcpc_exp 的 contribution_guide，先读取当前投稿 Schema、模板和工作流。
+这次是投稿整理，不是盲做；可用 reference 检索并阅读协会相似经验。
+先判断材料是否有可复用结论、真实依据、适用边界和新增价值。
+列出相关条目 ID 和新建/更新/不投稿的理由；缺材料先问，不编造。
+若适合投稿，给建议文件名、完整 Markdown（更新旧条目则给增量补丁）、PR 描述。
+只给草稿，我手动提交；没有实际运行校验就明确未校验。
+我的 GitHub 用户名、题目/场景、实际经历及验证结果：……
+```
+
+1. 核对草稿中的作者、日期、来源、证据及建议文件名。正文中的“草稿”不对应 `status: draft`；本仓库用 `kind`，不使用 `type: experience`，topics 是逗号分隔的单行值。
+2. 在自己的 Fork/投稿分支中，将 `.md` 添加到 `.agents/skills/xcpc-experience-coach/references/knowledge/`；若是旧条目增量，编辑原文件并保留稳定 ID。不要提交生成索引、知识包或个人聊天记录。
+3. 向本仓库 main 发起 PR，粘贴对比摘要和验证状态。可本地运行 `npm test`、`npm run validate`；只用网页时如实写“本地未运行，等待 CI”，不要提前勾选通过。
+4. CI 检查格式和确定性重复，维护者审核内容。合并与服务重新部署后才可在网页查询新经验。
+
+验收至少覆盖：能读到真实 Schema；纯感想建议留个人记录；已有 `__int128` 结论仅换标题时不新建；有真实新增证据时更新原条目；证据不足时不编造 active 成稿。完整推广与自动 PR 取舍见 [投稿试用说明](contribution-rollout.md)。
 
 ## 2. 获得可填写的连接地址
 
@@ -79,7 +102,7 @@ Cloudflare Quick Tunnel 不支持 SSE；本实现使用 Streamable HTTP 的 JSON
 | MCP URL | 上一步实际获得的 HTTPS 地址加 `/mcp` |
 | 身份验证 | 公开只读部署选 `No Authentication` |
 
-创建成功应发现两个工具 `search` 和 `fetch`。在聊天中选择该连接器；项目内是否能选择它以当前客户端实际入口为准。普通聊天连接成功不能代替项目内验收。
+创建成功应发现三个工具 `search`、`fetch` 和 `contribution_guide`。在聊天中选择该连接器；项目内是否能选择它以当前客户端实际入口为准。普通聊天连接成功不能代替项目内验收。
 
 ## 4. 与“acm复习训练”融合
 
