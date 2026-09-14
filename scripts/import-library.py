@@ -146,7 +146,7 @@ def relations(package, part):
     return result
 
 
-def extract(data, extension, warnings):
+def extract(data, extension, warnings, *, pdf_repairs=True):
     sections = []
     if extension == "pdf":
         from pypdf import PdfReader
@@ -156,11 +156,32 @@ def extract(data, extension, warnings):
         logger.handlers, logger.propagate = [logging.StreamHandler(log)], False
         try:
             reader = PdfReader(io.BytesIO(data), strict=False)
+            raw = [page.extract_text() or "" for page in reader.pages]
+            if pdf_repairs:
+                from pdf_fonts import repair_font_encodings
+                from pdf_symbols import repair_symbol_encodings
+                from pdf_visibility import filter_invisible_text
+                warnings.extend(repair_font_encodings(reader))
+                warnings.extend(repair_symbol_encodings(reader))
+            changed = []
+            visibility_warnings = {}
             for number, page in enumerate(reader.pages, 1):
-                text = visible_text(page.extract_text() or "", warnings)
+                if pdf_repairs:
+                    visibility = filter_invisible_text(page)
+                    for message in visibility["warnings"]:
+                        visibility_warnings.setdefault(message, []).append(number)
+                text = (page.extract_text() or "") if pdf_repairs else raw[number - 1]
                 if not text.strip():
                     warnings.append(f"物理页 {number} 提取为空；可能为图片或空白页。")
+                if text != raw[number - 1]:
+                    changed.append(number)
+                    text = "[自动提取修复：依据原字体编码/已核对字形恢复字符，排除可确定的不可见文字；上下标、分数和图表仍需原页核对，未完成本页视觉审核。]\n" + text
+                text = visible_text(text, warnings)
                 sections.append(f"## 物理页 {number}\n\n" + fenced(text))
+            warnings.extend(message + "（物理页：" + ", ".join(map(str, pages)) + "）"
+                            for message, pages in visibility_warnings.items())
+            if changed:
+                warnings.append("自动提取修复页：" + ", ".join(map(str, changed)) + "；仅依据原字体和明确可见性处理，不代表公式或布局完整。")
         finally:
             logger.handlers, logger.propagate = handlers, propagate
             warnings.extend("PDF 解析器：" + message for message in log.getvalue().splitlines())
@@ -273,12 +294,15 @@ def correction_pages(files, corrections):
     return result
 
 
-def correct_body(body, pages):
+def correct_body(body, pages, *, original_body=None):
+    original_body = body if original_body is None else original_body
     for page, record in pages.items():
         heading = f"## 物理页 {page}"
         pattern = re.compile(r"^" + re.escape(heading) + r"\n\n(?P<fence>`{3,})text\n.*?\n(?P=fence)\n", re.M | re.S)
         matches = list(pattern.finditer(body))
-        if len(matches) != 1 or sha256(matches[0].group().encode("utf8")) != record["extracted_sha256"]:
+        originals = list(pattern.finditer(original_body))
+        if (len(matches) != 1 or len(originals) != 1
+                or sha256(originals[0].group().encode("utf8")) != record["extracted_sha256"]):
             raise ValueError(f"修订页 {page} 的原始提取内容不匹配；停止导入，需重新核对")
         note = f"[视觉转录修订：已对照固定原件物理页 {page}；仅此页正文，不代表整份材料已审核。]"
         replacement = heading + "\n\n" + fenced(note + "\n" + record["text"])
@@ -287,7 +311,7 @@ def correct_body(body, pages):
     return body
 
 
-def import_archive(archive, output, corrections=()):
+def import_archive(archive, output, corrections=(), *, pdf_repairs=True):
     files = read_archive(archive)
     revised = correction_pages(files, corrections)
     entries, outputs, duplicates = [], {}, {}
@@ -319,7 +343,7 @@ def import_archive(archive, output, corrections=()):
                 entry["status"] = "needs-review"
                 entry["warnings"].append(LAYOUT_WARNING)
             try:
-                body, entry["units"] = extract(data, extension, entry["warnings"])
+                body, entry["units"] = extract(data, extension, entry["warnings"], pdf_repairs=pdf_repairs)
             except Exception as error:
                 entry["status"] = "failed"
                 entry["warnings"].append(f"提取失败：{type(error).__name__}: {error}")
@@ -327,7 +351,8 @@ def import_archive(archive, output, corrections=()):
                     raise ValueError(f"待修订来源提取失败：{path}") from error
             else:
                 if path in revised:
-                    body = correct_body(body, revised[path])
+                    original_body, _ = extract(data, extension, [], pdf_repairs=False)
+                    body = correct_body(body, revised[path], original_body=original_body)
                     entry["warnings"].append("局部视觉转录修订：物理页 " + ", ".join(map(str, revised[path]))
                                              + "；依据与修订文本见 sources/wzj52501/corrections.json，其余页仍待核对。")
                 if entry["warnings"] and role != "metadata":
