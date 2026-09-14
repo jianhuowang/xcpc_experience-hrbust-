@@ -26,9 +26,12 @@ export async function checkMcp(url) {
     const id = 'wzj52501-0f0daa9b82cfef46';
     assert.equal((await call('fetch', { id, mode: 'H1' })).text, '');
     const lecture = await call('fetch', { id, mode: 'reference', unit: 'page', start: 41, count: 1 });
-    assert.match(lecture.text, /U\+001[45]/);
+    assert.match(lecture.text, /f\(x\) \+ g\(x\) ≤ cans/);
+    assert.doesNotMatch(lecture.text, /h\(x\)|U\+001[45]/);
     assert.equal(lecture.metadata.status, 'needs-review');
     assert.match(lecture.metadata.location, /物理页 41/);
+    assert.match((await call('fetch', { id, mode: 'reference', start: 42 })).text, /h\(x\) ≥ g\(x\)/);
+    assert.match((await call('fetch', { id, mode: 'reference', start: 43 })).text, /U\+0014/);
     const sources = [];
     for (const args of [
       { id: 'wzj52501-e2940294a8c44755', unit: 'paragraph', start: 1, count: 4 },

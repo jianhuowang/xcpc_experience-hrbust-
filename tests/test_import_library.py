@@ -45,6 +45,37 @@ def pdf():
 
 
 class ImportLibraryTests(unittest.TestCase):
+    def test_visual_corrections_are_bound_to_source_and_extracted_page(self):
+        path = "Lectures/ok.pdf"
+        archive = self.archive({path: pdf()})
+        files = self.library.read_archive(archive)
+        body, _ = self.library.extract(files[path], "pdf", [])
+        original = body.split("## 物理页 2")[0].rstrip("\n") + "\n"
+        record = {"id": "wzj52501-" + hashlib.sha256(path.encode()).hexdigest()[:16],
+                  "path": path, "source_sha256": hashlib.sha256(files[path]).hexdigest(),
+                  "page": 1, "extracted_sha256": hashlib.sha256(original.encode()).hexdigest(),
+                  "text": "first page ≤ 10^7", "reason": "原页对照回归"}
+        self.library.import_archive(archive, self.output, corrections=[record])
+        content = (self.output / "text/Lectures/ok.pdf.md").read_text("utf8")
+        self.assertIn("first page ≤ 10^7", content)
+        self.assertIn("视觉转录修订", content)
+        self.assertIn("## 物理页 2", content)
+        manifest = json.loads((self.output / "manifest.json").read_text("utf8"))
+        self.assertEqual(next(e for e in manifest["entries"] if e["path"] == path)["status"], "needs-review")
+        before = (self.output / "manifest.json").read_bytes()
+        for change in [{"source_sha256": "0" * 64}, {"extracted_sha256": "0" * 64},
+                       {"id": "wrong"}, {"page": 3}, {"text": ""}]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.library.import_archive(archive, self.output, corrections=[{**record, **change}])
+            self.assertEqual((self.output / "manifest.json").read_bytes(), before)
+        with self.assertRaises(ValueError):
+            self.library.import_archive(archive, self.output, corrections=[record, record])
+        blocked = "Lectures/Basic-Algorithms_cjl.pdf"
+        with self.assertRaises(ValueError):
+            self.library.import_archive(self.archive({blocked: files[path]}), self.output,
+                corrections=[{**record, "path": blocked,
+                              "id": "wzj52501-" + hashlib.sha256(blocked.encode()).hexdigest()[:16]}])
+
     def setUp(self):
         self.assertTrue(SCRIPT.exists(), "需先实现离线归档导入器")
         spec = importlib.util.spec_from_file_location("import_library", SCRIPT)
