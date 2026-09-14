@@ -14,6 +14,33 @@ const removeTemp = (path) => {
   rmSync(resolved, { recursive: true, force: true });
 };
 
+test('contribution guide returns only complete, revision-pinned governance documents', (t) => {
+  const temp = mkdtempSync(join(tmpdir(), 'xcpc-mcp-'));
+  t.after(() => removeTemp(temp));
+  const paths = ['.agents/skills/xcpc-experience-coach/references/contribution-schema.md',
+    '.agents/skills/xcpc-experience-coach/SKILL.md', '.github/pull_request_template.md'];
+  for (const path of paths) {
+    mkdirSync(resolve(temp, path, '..'), { recursive: true });
+    cpSync(join(root, path), join(temp, path));
+  }
+  execFileSync('git', ['init'], { cwd: temp });
+  execFileSync('git', ['add', '.'], { cwd: temp });
+  execFileSync('git', ['-c', 'user.name=test', '-c', 'user.email=test@example.invalid', 'commit', '-m', 'guide snapshot'], { cwd: temp });
+  const snapshot = loadCatalog(temp);
+  writeFileSync(join(temp, paths[0]), 'uncommitted fabricated schema', 'utf8');
+  const guide = snapshot.contributionGuide({});
+  assert.deepEqual(guide.documents.map(doc => doc.path), paths);
+  for (const doc of guide.documents) {
+    assert.equal(doc.text, execFileSync('git', ['show', `${guide.knowledge_revision}:${doc.path}`], { cwd: temp, encoding: 'utf8' }));
+    assert.ok(doc.url.includes(`/blob/${guide.knowledge_revision}/`));
+  }
+  assert.equal(guide.submission_directory, '.agents/skills/xcpc-experience-coach/references/knowledge');
+  assert.match(guide.documents[0].text, /kind: algorithm/);
+  for (const args of [{ path: '../../private' }, { kind: 'experience' }, null, []]) {
+    assert.throws(() => snapshot.contributionGuide(args), /invalid_argument/);
+  }
+});
+
 test('searches metadata only with synonyms, scope and pagination', () => {
   const association = catalog.search({ query: 'int128', scope: 'association' });
   assert.equal(association.results[0].id, '20260902-jianhuowang-int128-requires-64bit');

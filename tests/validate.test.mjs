@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -70,6 +70,16 @@ function validate(content, extraEntries = {}) {
 
 test("accepts a valid entry without reviewers", () => {
   const result = validate(entry());
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
+
+test("published drafting skeleton requires completion and matches the real validator", () => {
+  const schema = readFileSync('.agents/skills/xcpc-experience-coach/references/contribution-schema.md', 'utf8');
+  const template = schema.match(/```markdown\r?\n(---\r?\n[\s\S]*?)\r?\n```/)[1] + '\n';
+  assert.notEqual(validate(template).status, 0);
+  const completed = template.replace('YYYY-MM-DD', '2026-09-14')
+    .replace(/待补充：[^\r\n]*/g, '仅用于验证模板与校验器契约的测试内容。');
+  const result = validate(completed);
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
 

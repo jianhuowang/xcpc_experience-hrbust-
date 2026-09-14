@@ -10,7 +10,7 @@ export async function checkMcp(url) {
   try {
     await client.connect(new StreamableHTTPClientTransport(new URL(url)));
     const { tools } = await client.listTools();
-    assert.deepEqual(tools.map(tool => tool.name).sort(), ['fetch', 'search']);
+    assert.deepEqual(tools.map(tool => tool.name).sort(), ['contribution_guide', 'fetch', 'search']);
     assert.ok(tools.every(tool => tool.annotations?.readOnlyHint));
     const call = async (name, args) => {
       const result = await client.callTool({ name, arguments: args });
@@ -18,7 +18,13 @@ export async function checkMcp(url) {
       assert.deepEqual(JSON.parse(result.content[0].text), result.structuredContent);
       return result.structuredContent;
     };
+    const guide = await call('contribution_guide', {});
+    assert.equal(guide.documents.length, 3);
+    assert.match(guide.documents[0].text, /kind: algorithm/);
+    assert.match(guide.documents[0].text, /status.*active.*deprecated/);
+    assert.ok(guide.documents.every(doc => doc.url.includes(`/blob/${guide.knowledge_revision}/`) && doc.text.length > 0));
     const association = await call('search', { query: '__int128', scope: 'association', mode: 'reference' });
+    assert.equal(guide.knowledge_revision, association.knowledge_revision);
     assert.equal(association.results[0].id, '20260902-jianhuowang-int128-requires-64bit');
     const knowledge = await call('fetch', { id: association.results[0].id, mode: 'reference', start: 1, count: 30 });
     assert.match(knowledge.text, /64 位/);

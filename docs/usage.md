@@ -192,6 +192,8 @@ Agent 会先检索并阅读已有条目，给出“已查范围与相关 ID、�
 
 ### 投稿前判断是否值得收录
 
+具体门槛与例子以 [Schema 的“什么值得共享”](../.agents/skills/xcpc-experience-coach/references/contribution-schema.md#什么值得共享) 为准。一次明确复现并说明边界的经验也可标记 `single-case`；不必为了投稿凑次数，不把单次观察泛化为普遍结论。
+
 适合投稿：
 
 - 实战中反复踩过的实现或调试坑；
