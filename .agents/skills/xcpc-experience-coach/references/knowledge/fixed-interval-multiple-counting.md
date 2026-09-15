@@ -1,4 +1,4 @@
-````markdown
+
 ---
 kind: algorithm
 topics: interval-counting, floor-division, ceil-division, multiples
