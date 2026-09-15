@@ -5,6 +5,7 @@ import { knowledgeFiles, parseDocument } from "./knowledge.mjs";
 const knowledgeRoot = resolve(process.argv[2] ?? ".agents/skills/xcpc-experience-coach/references/knowledge");
 const allowedFields = new Set(["kind", "topics", "evidence", "authors", "status", "updated", "related"]);
 const requiredFields = ["kind", "topics", "evidence", "authors", "status", "updated"];
+const stableId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const enums = {
   kind: ["algorithm", "implementation", "debugging", "contest", "team", "training"],
   evidence: ["single-case", "repeated-practice", "source-backed", "team-consensus"],
@@ -32,7 +33,7 @@ function section(body, heading) {
 function validateFile(path, knownIds, activeBodies) {
   const errors = [];
   const name = basename(path);
-  if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+\.md$/.test(name)) errors.push("文件名必须符合 YYYYMMDD-author-short-title.md");
+  if (!stableId.test(basename(name, ".md"))) errors.push("文件名必须为小写英文、数字和单连字符组成的 short-title.md；兼容已有日期作者前缀");
 
   let document;
   try {
@@ -68,7 +69,7 @@ function validateFile(path, knownIds, activeBodies) {
   if (!authors.length || authors.some((user) => !/^@[A-Za-z0-9-]+$/.test(user))) errors.push("authors 必须使用 GitHub @用户名");
 
   for (const id of list(fields.related ?? "")) {
-    if (!/^\d{8}-[a-z0-9-]+-[a-z0-9-]+$/.test(id)) errors.push(`related 条目 ID 非法：${id}`);
+    if (!stableId.test(id)) errors.push(`related 条目 ID 非法：${id}`);
     else if (id === basename(path, ".md")) errors.push(`related 不能指向自身：${id}`);
     else if (!knownIds.has(id)) errors.push(`related 条目不存在：${id}`);
   }

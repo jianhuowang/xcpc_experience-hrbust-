@@ -73,6 +73,25 @@ test("accepts a valid entry without reviewers", () => {
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
 
+test("topic IDs coexist with legacy IDs and preserve related validation", () => {
+  const topic = "trie-lcp-count-contribution";
+  const legacy = "20260902-alice-shortest-path";
+  const result = validate(entry({ related: topic }), {
+    [`${topic}.md`]: entry({ status: "deprecated", related: legacy }),
+  });
+  assert.equal(result.status, 0, result.stderr);
+  for (const related of [topic, "missing-topic"]) {
+    const invalid = validate(entry(), { [`${topic}.md`]: entry({ status: "deprecated", related }) });
+    assert.notEqual(invalid.status, 0);
+    assert.match(invalid.stderr, /related.*(自身|不存在)/);
+  }
+  for (const name of ["Trie-LCP", "trie_lcp", "-trie", "trie--lcp"]) {
+    const invalid = validate(entry(), { [`${name}.md`]: entry({ status: "deprecated" }) });
+    assert.notEqual(invalid.status, 0);
+    assert.match(invalid.stderr, /文件名/);
+  }
+});
+
 test("published drafting skeleton requires completion and matches the real validator", () => {
   const schema = readFileSync('.agents/skills/xcpc-experience-coach/references/contribution-schema.md', 'utf8');
   const template = schema.match(/```markdown\r?\n(---\r?\n[\s\S]*?)\r?\n```/)[1] + '\n';

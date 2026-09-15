@@ -230,7 +230,7 @@ Agent 会先检索并阅读已有条目，给出“已查范围与相关 ID、�
 2. 没有仓库写权限时，点击 **Fork** 创建个人副本；有写权限时也必须新建分支，不直接改 main。
 3. 打开 `.agents/skills/xcpc-experience-coach/references/knowledge/`。
 4. 补充已有经验时打开原文件并点击编辑；独立新经验才点击 **Add file → Create new file**。
-5. 新文件名使用 `YYYYMMDD-author-short-title.md`，例如 `20260903-alice-dijkstra-overflow.md`；更新原条目保留文件名和原作者，按贡献补充 authors 并更新 updated。
+5. 新文件名使用 `short-title.md`，例如 `dijkstra-overflow.md`，不添加作者和日期；旧条目保留原文件名（包括历史日期前缀）和原作者，按贡献补充 authors 并更新 updated。Agent 应按 Schema 交付尽量填好的完整稿、待补清单及 PR 标题/描述；补齐占位内容后再上传。
 6. 粘贴按 Schema 整理并人工核对后的 Markdown。
 7. `authors` 填真实 GitHub `@用户名`；投稿者不要增加 `reviewers`。审核记录由 GitHub PR approvals、CODEOWNERS 和 merge history 保存。
 8. 提交到一个新分支，例如 `experience/alice-dijkstra-overflow`。
