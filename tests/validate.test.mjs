@@ -95,9 +95,18 @@ test("topic IDs coexist with legacy IDs and preserve related validation", () => 
 test("published drafting skeleton requires completion and matches the real validator", () => {
   const schema = readFileSync('.agents/skills/xcpc-experience-coach/references/contribution-schema.md', 'utf8');
   const template = schema.match(/```markdown\r?\n(---\r?\n[\s\S]*?)\r?\n```/)[1] + '\n';
-  assert.notEqual(validate(template).status, 0);
-  const completed = template.replace('YYYY-MM-DD', '2026-09-14')
+  const blank = validate(template);
+  assert.notEqual(blank.status, 0);
+  assert.match(blank.stderr, /缺少字段：authors/);
+  assert.match(blank.stderr, /缺少字段：updated/);
+  const filled = template.replace(/^authors:[^\r\n]*/m, 'authors: "@alice"')
+    .replace(/^updated:[^\r\n]*/m, 'updated: 2026-09-15')
     .replace(/待补充：[^\r\n]*/g, '仅用于验证模板与校验器契约的测试内容。');
+  const missingSource = filled.replace(/(## 来源\r?\n)[\s\S]*?(?=## )/, '$1\n');
+  const incomplete = validate(missingSource);
+  assert.notEqual(incomplete.status, 0);
+  assert.match(incomplete.stderr, /缺少内容：## 来源/);
+  const completed = missingSource.replace('## 来源', '## 来源\nhttps://example.org/test-fixture');
   const result = validate(completed);
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
