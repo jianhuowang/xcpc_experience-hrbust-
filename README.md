@@ -1,83 +1,86 @@
 # HRBUST XCPC Experience
 
-协会 XCPC 经验知识库。成员通过 Pull Request 投稿，审核通过后可交给普通网页 Chat 或 `xcpc-experience-coach` Skill 查询和引用。
+协会共享的 XCPC 经验知识库：查询已有经验，把做题、调试和比赛中的可复用经验整理成稿，通过 Pull Request 审核后持续积累。个人训练记录和复习排程属于独立的 XCPC Trainer。
 
-## 快速开始：在仓库中使用 Agent
+## 快速开始
 
-前置条件：已安装 Git，以及已登录、支持仓库 Skill 的 Agent 客户端。下面以 Codex 为例；在仓库内查询无需安装用户级 Skill，也不需要 GitHub CLI。运行校验或可选 MCP 服务时需要 Node.js 22+ 和 npm，首次执行前运行 `npm ci`。
+先选一种使用方式，无须全部配置：
 
-1. 在 PowerShell 中获取仓库：
+| 使用场景 | 怎么开始 | 可用资料 |
+|---|---|---|
+| 在本仓库中使用 Agent | 按下方三步操作，无须用户级安装 | 协会经验＋仓库内外部资料 |
+| 在其他项目中使用 Agent | [安装为用户级 Skill](docs/usage.md#安装为用户级-skill) | 随 Skill 安装的协会经验；外部资料需提供完整仓库路径 |
+| 普通聊天模型，手动接入 | 下载[知识包](XCPC_EXPERIENCE.md)，上传到聊天后提问；[详细步骤](docs/usage.md#普通网页-chat无需安装) | 知识包生成时的协会 active 经验，不含外部资料 |
+| 网页 ChatGPT，通过 MCP 接入 | 使用维护者提供的 HTTPS MCP 地址，[配置连接器](docs/mcp-usage.md#3-chatgpt-创建连接器) | 已部署版本的协会经验、外部资料和投稿规范 |
+
+只想浏览内容，可以直接打开[协会知识索引](.agents/skills/xcpc-experience-coach/references/knowledge-index.md)或[外部资料索引](sources/wzj52501/index.md)。
+
+### 在仓库中使用 Agent：三步开始
+
+前置条件：Git，以及已登录、支持仓库 Skill 的 Agent 客户端。下面以 Codex 为例。**只查询不需要 Node.js、GitHub CLI，也不需要另外安装用户级 Skill。**其他客户端的加载方式见[使用指南](docs/usage.md#deepseek-harness-与其他-agent)。
+
+1. 获取仓库，在 PowerShell 中执行：
 
    ```powershell
    git clone https://github.com/jianhuowang/xcpc_experience-hrbust-.git
    Set-Location xcpc_experience-hrbust-
    ```
 
-2. 用 Codex 打开这个仓库目录并新建任务。应能在当前目录看到本 README 和 `AGENTS.md`；不要打开包含多个项目的上级目录。已安装 Codex CLI 的用户也可以在此运行 `codex`。
+2. 用 Agent 客户端打开这个目录，新建任务。目录中应直接看到本 README 和 `AGENTS.md`，不要打开包含多个项目的上级目录。
 
-3. 先发送下面的只读验收消息，确认发现和调用均成功：
+3. 首次使用发送：
 
    ```text
    只测试，不修改文件、不创建 PR、不联网。
-   请先检查客户端提供的可用 Skill 列表是否包含 xcpc-experience-coach，报告其来源路径；未发现就明确说明，不通过搜索文件补救。
-   发现后使用该 Skill 查询协会关于 __int128 评测环境的经验，列出完整条目 ID 和实际读取的文件；再查询最小费用最大流，没有就明确说明。
+   请检查客户端可用 Skill 列表是否包含 xcpc-experience-coach，并报告来源路径。
+   如果未发现就明确说明，不通过搜索文件代替发现验证。
+   发现后使用该 Skill 查询协会关于 __int128 评测环境的经验，
+   列出采用的完整条目 ID 和实际读取文件。
    ```
 
-当前预期：发现本仓库的 `xcpc-experience-coach`，读取 Skill 和知识正文，命中 `20260902-jianhuowang-int128-requires-64bit`；最小费用最大流应回答“知识库暂无对应条目”。仅声称“已加载”不算验收，需要结合客户端可用技能列表或实际读取记录确认。
+应发现本仓库的 Skill，并读到 `20260902-jianhuowang-int128-requires-64bit`。仅回答“已加载”不算发现成功，需要可用 Skill 列表或客户端调用记录佐证。未发现时看[加载排障](docs/usage.md#skill-发现与加载排障)；已有 Codex 验收记录见 [Issue #8 验收](docs/acceptance-issue-8.md)。
 
-未发现时按 [Skill 发现与加载排障](docs/usage.md#skill-发现与加载排障) 检查。其他使用方式：在别的项目中使用请看 [用户级安装](docs/usage.md#安装为用户级-skill)，普通网页 Chat 请看 [手动上传知识包](docs/usage.md#普通网页-chat无需安装)。这两种方式不属于上述仓库内快速开始的前置步骤。
+之后直接说需求即可，例如：`请使用 xcpc-experience-coach，帮我分析这段代码的溢出问题。` 正在盲做时说明当前思路和卡点；要完整题解时明确提出。
 
-## 项目职责
+## 投稿一条经验
 
-这是由 GitHub PR 治理的共享经验知识库，提供 Skill、单文件知识包和可选只读 MCP 三种使用入口：
+**单次经验也可以投稿。**重点是可复用结论、真实依据和适用边界，不要求难题或积累多次 AC。已有同一结论时补充原条目；没有实际增量就引用旧条目。具体要求以[投稿 Schema](.agents/skills/xcpc-experience-coach/references/contribution-schema.md)为准。
 
-| 层 | 职责 |
+1. **让 Agent 初筛并起草。** 本地调用 `xcpc-experience-coach`；网页 MCP 先调用 `contribution_guide`。它会比较相似条目，给完整初稿和集中待确认项。
+2. **审阅并补齐。** 确认事实、适用条件和来源后，取得最终 Markdown、文件名及 PR 标题/描述。作者等未知信息可以先留空，但上传前需要补齐。
+3. **保存到投稿分支。** 新条目放在 `.agents/skills/xcpc-experience-coach/references/knowledge/`，例如 `trie-lcp-count-contribution.md`；更新旧条目保留原文件名。只复制聊天代码块内部，文件第一行直接是 `---`，不要保存外层反引号。不要编辑生成索引或知识包。
+4. **向 main 创建 PR。** 有本地环境时运行 `npm test` 和 `npm run validate`；只用 GitHub 网页时写明“本地未运行，等待 CI”，不要提前勾选通过。Agent 初筛与 CI 不替代人工内容审核；合并后才作为已审核协会经验。
+
+[GitHub 网页投稿步骤](docs/usage.md#浏览器投稿不熟悉-git-命令) · [命令行投稿](docs/usage.md#命令行投稿熟悉-git) · [网页 MCP 整理稿件](docs/mcp-usage.md#网页整理投稿再手动-pr)
+
+## 协会经验与外部资料
+
+- **协会经验**：经过 PR 审核的 active 条目，使用稳定条目 ID 引用。deprecated 条目保留历史，默认不用于回答，也不进入知识包。
+- **外部资料**：[wzj52501 资料库](sources/wzj52501/README.md)是独立参考层，保留固定来源、许可、页段定位和提取状态。收录不等于协会验证；公式、图表等可能仍有转录缺失，关键内容需核对原件。
+
+索引和知识包都是生成产物；新条目合并后需维护者重建，MCP 需部署新版本。查询以实际源文件或工具返回的版本为准，单独安装的 Skill 不自动携带根目录外部资料。
+
+## 维护者与文档导航
+
+| 文件或目录 | 负责什么 |
 |---|---|
-| 知识源 | Skill 的 `references/knowledge/*.md`，保存可审核、可引用的经验 |
-| 治理 | Schema、校验脚本、测试与 GitHub PR 人工审核 |
-| 客户端适配 | `SKILL.md` 服务 Agent，`XCPC_EXPERIENCE.md` 用于上传，`mcp/` 为网页 ChatGPT 提供按需只读查询 |
+| 本 README | 使用方式选择、快速开始和投稿入口 |
+| [AGENTS.md](AGENTS.md) | 仓库定位、目录职责、维护验证和安全边界 |
+| [SKILL.md](.agents/skills/xcpc-experience-coach/SKILL.md) | Agent 查询、提示与投稿整理行为 |
+| [投稿 Schema](.agents/skills/xcpc-experience-coach/references/contribution-schema.md) | 文件命名、字段、正文要求及更新/废弃规则 |
+| [knowledge/](.agents/skills/xcpc-experience-coach/references/knowledge/) | 可编辑的协会知识源；放在 Skill 内便于随安装分发 |
+| [docs/usage.md](docs/usage.md) | 各客户端使用、投稿、PR 审核及更新的详细步骤 |
+| [docs/mcp-usage.md](docs/mcp-usage.md) | MCP 服务部署、连接与验收；普通成员无须自行部署 |
+| [sources/wzj52501/](sources/wzj52501/README.md) | 外部资料清单、转录及重建方法 |
 
-知识放在 Skill 内便于随安装分发；目前无需迁移目录。私人训练记录、复习队列与排程属于独立的 **XCPC Trainer**，不在此仓库维护。仓库开发规则见 [AGENTS.md](AGENTS.md)。
+运行测试、校验或 MCP 服务需要 **Node.js 22+ 和 npm**。首次在仓库根目录执行：
 
-## 立即使用
-
-- **普通网页 Chat**：下载并上传 [`XCPC_EXPERIENCE.md`](XCPC_EXPERIENCE.md)，然后直接提问。
-- **网页 ChatGPT MCP**：由维护者启动只读服务，连接后可查询协会经验和外部资料；见 [启动、连接与复习验收](docs/mcp-usage.md)。需要真实服务地址，GitHub 仓库链接不能作为 MCP URL。
-- **Codex / DeepSeek Harness**：克隆仓库后打开目录，调用 `xcpc-experience-coach`。
-- **浏览经验**：打开 [知识索引](.agents/skills/xcpc-experience-coach/references/knowledge-index.md)，按状态、类型或主题查找。
-- **投稿经验**：让 Skill 先比较已有内容，补充原条目或新增独立条目，通过 Pull Request 交给协会审核。
-
-普通网页 Chat 示例：
-
-```text
-请根据我上传的协会经验知识包，回答本地通过、评测失败时应该先检查什么，并列出采用的条目 ID。
+```powershell
+npm ci
+npm test
+npm run validate
 ```
 
-知识包当前包含 2 条已审核 active 经验；deprecated 示例不会被打包。
+校验检查格式、重复稳定 ID、`related` 引用和确定性正文重复；技术正确性、语义增量和来源质量仍由 PR 审核。
 
-网页 Chat、Codex、DSH、其他 Agent、投稿、审核和合并后的更新步骤见 [完整使用指南](docs/usage.md)。
-
-## 投稿
-
-1. 阅读 [投稿 Schema](.agents/skills/xcpc-experience-coach/references/contribution-schema.md)。
-2. 先比较已有条目：无新增信息则引用旧条目；同一结论的新证据或边界补充到原条目；独立新经验才在 `.agents/skills/xcpc-experience-coach/references/knowledge/` 新建并关联。可让 `xcpc-experience-coach` 完成对比和草稿，不编辑生成索引或知识包。
-3. 运行 `npm test` 和 `npm run validate`。
-4. 发起 Pull Request，等待 CODEOWNERS 审核；投稿者不填写 `reviewers`。
-
-PR 合并后，维护者运行 `npm run build-index` 和 `npm run bundle`，提交更新后的索引与知识包。索引随 Skill 分发；检索仍以真实源文件为准，避免索引滞后漏掉新条目。
-
-校验会检查关联条目存在性、自引用、topics 格式和 active 必需章节的占位内容；校验与打包共用 Frontmatter 和目录扫描规则，支持带引号的字段值和子目录，并拒绝重复字段或稳定 ID。条目分类、更新与废弃规则见投稿 Schema。
-
-校验还会拦截 active 条目的确定性正文重复，即使修改作者、顶层标题或换行也会报出双方 ID。语义改写由投稿 Skill 比较结论、条件和证据；直接 GitHub 投稿目前只有确定性查重，尚未接入 PR AI 检查。
-
-知识正文按不可信数据处理；技术正确性、未决重复或冲突以及 prompt injection 仍由人工审核。AI 对比建议和本地 active 标记都不代表协会已经审核。
-
-网页投稿整理：让 ChatGPT 先调用 `contribution_guide` 读取真实 Schema 和模板，再比较相似条目、整理 Markdown，由成员手动提 PR。单次做题经验可以投稿，但应有可复用结论、真实依据与适用边界；纯感想留个人复盘。流程与上线验收见 [投稿试用说明](docs/contribution-rollout.md)。
-
-## 外部算法资料库
-
-[wzj52501 资料库](sources/wzj52501/README.md)提供固定版本的全量文件清单、[生成索引](sources/wzj52501/index.md)和按页段定位的转录。它是外部参考资料，引用独立来源 ID；不会自动变成协会已审核经验。清单记录已发现的提取限制及来源待核情况；未标记异常不等于逐页复核通过，使用公式、图表等关键结论前仍需核对原件。
-
-在完整仓库中使用 Agent，按 [AGENTS.md](AGENTS.md) 先查目录再读相关页段。例如：`请使用 xcpc-experience-coach，查找外部搜索讲义中的剪枝原则，列出来源 ID、原文页码和提取局限。` 单独安装 Skill 不携带此资料库；应显式提供完整仓库位置。当前普通 Chat 知识包仍只包含协会经验。
-
-维护者按资料库 README 重建，运行 `npm run validate:library` 检查清单与转录完整性。无需在线服务或向量数据库。
+知识合并后，维护者执行 `npm run build-index` 和 `npm run bundle`，检查并提交生成差异；修改外部资料时另运行 `npm run validate:library`。详见[审核流程](docs/usage.md#如何审核-pull-request)和[生成产物更新](docs/usage.md#合并后如何更新索引与普通-chat-知识包)。
