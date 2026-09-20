@@ -2,7 +2,7 @@
 kind: algorithm
 topics: mex, offline-query, preprocessing, amortized-analysis
 evidence: single-case
-authors:
+authors:@jianhuowang
 status: active
 updated: 2026-09-20
 related:
