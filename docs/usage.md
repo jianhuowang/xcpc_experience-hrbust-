@@ -10,9 +10,9 @@
 | 用 DeepSeek Harness（DSH） | 以本仓库作为工作区，调用 `/xcpc-experience-coach` |
 | 浏览主题、类型或历史经验 | 打开 [知识索引](../.agents/skills/xcpc-experience-coach/references/knowledge-index.md) |
 | 投稿或修正一条经验 | 先让 Skill 比较已有内容，更新原条目或新增独立条目，再发起 Pull Request |
-| 审核或合并投稿 | 核实内容与来源、未决重复或冲突；合并后刷新索引与知识包 |
+| 审核或合并投稿 | 核实内容与来源、未决重复或冲突；合并后确认自动发布成功 |
 
-仓库目前共有 5 条知识：2 条 `active`、3 条 `deprecated` 示例。普通 Chat 知识包和 Skill 查询都只把 active 条目当作协会经验。
+最新条目数量和状态见自动生成的[知识索引](../.agents/skills/xcpc-experience-coach/references/knowledge-index.md)。普通 Chat 知识包和 Skill 查询都只把 active 条目当作协会经验。
 
 ## 普通网页 Chat：无需安装
 
@@ -68,7 +68,7 @@ https://raw.githubusercontent.com/jianhuowang/xcpc_experience-hrbust-/main/XCPC_
 
 - 新开了一个聊天；
 - 当前聊天的附件已失效或模型不再记得文件；
-- 仓库刚合并了新经验，维护者已经刷新知识包；
+- 仓库刚合并了新经验，Actions 已成功刷新知识包；
 - 回答引用了已经 deprecated 的旧条目或无法列出条目 ID。
 
 网页 Chat 中的旧附件不会跟随 GitHub 自动更新。如需按需查询协会经验与外部资料，可选用 [只读 MCP](mcp-usage.md)；维护者更新仓库并重启服务后，新查询使用新快照，既有聊天回答不会自动更新。
@@ -188,7 +188,7 @@ Agent 会先检索并阅读已有条目，给出“已查范围与相关 ID、�
 | 独立的新结论或不同问题 | 新建条目，有相关经验时填写 related |
 | 存在冲突或证据不足 | 列出差异和待核实信息，不自动覆盖旧结论 |
 
-草稿写入知识仓库后运行全库 `npm run validate`，你查看具体修改，再明确要求 Agent 提交或创建 PR。维护者核实内容后合并，并刷新索引和知识包。用户级 Skill 副本可能滞后，不能直接修改安装目录；应在目标仓库中应用草稿并重新查重。
+草稿写入知识仓库后运行全库 `npm run validate`，你查看具体修改，再明确要求 Agent 提交或创建 PR。维护者核实内容后合并，Actions 在校验通过后自动刷新索引和知识包。用户级 Skill 副本可能滞后，不能直接修改安装目录；应在目标仓库中应用草稿并重新查重。
 
 ### 投稿前判断是否值得收录
 
@@ -289,24 +289,25 @@ git push -u origin experience/你的用户名-简短主题
 
 ## 合并后如何更新索引与普通 Chat 知识包
 
-投稿者不修改生成产物，因此维护者合并一个或多个经验 PR 后统一刷新一次（脚本与测试需要 Node.js 22 或更高版本）：
+投稿者只提交知识源文件。合并到 main 后，**Validate knowledge** 工作流先校验，再由 `publish` 任务自动生成并提交索引和知识包；内容没有变化就不创建提交。无需维护者每次手动运行命令。
+
+发布任务仅有 `contents: write` 权限，只允许提交这两个生成文件。它使用 GitHub 自带的 `GITHUB_TOKEN`，不需要个人令牌；PR 校验仍为只读。发布遇到 main 更新会从最新版本重新生成、校验，最多尝试三次，不强制推送。机器人推送不触发普通 push 工作流，因此所有生成与 Node 校验在发布前执行。
+
+**失败恢复：** 在 GitHub → Actions → Validate knowledge 查看失败日志。修复源文件、权限或环境问题后，选择 **Run workflow → main**；脚本会读取最新 main，不发布旧版本产物。若以后启用分支保护并禁止机器人直推，需先调整发布方案，不能通过强推绕过规则。
+
+本地排查仍可在独立分支运行（Node.js 22 或更高版本）：
 
 ```powershell
-git switch main
-git pull --ff-only
 npm run build-index
 npm run bundle
 git diff -- .agents/skills/xcpc-experience-coach/references/knowledge-index.md XCPC_EXPERIENCE.md
 npm test
 npm run validate
-git add .agents/skills/xcpc-experience-coach/references/knowledge-index.md XCPC_EXPERIENCE.md
-git commit -m "docs: refresh plain chat knowledge bundle"
-git push
 ```
 
-两个生成命令只读取源知识，不修改原始条目。索引按状态、类型和主题包含 active 与 deprecated，并在每行显示状态；知识包只含 active。若只更新 deprecated 历史，知识包没有变化是正常现象。CI 检查索引可生成，不要求投稿者提交生成差异；正式刷新产物仍遵守仓库现行分支和 PR 规则。
+两个生成命令只读取源知识，不修改原始条目。索引按状态、类型和主题包含 active 与 deprecated，并在每行显示状态；知识包只含 active。若只更新 deprecated 历史，知识包没有变化是正常现象。PR 校验检查两份产物可生成，不要求投稿者提交生成差异。
 
-首版不使用机器人自动提交，避免引入额外权限和维护成本。如果维护者经常忘记刷新，再把同一条命令接入 GitHub Actions。
+自动发布更新仓库中的生成文件，不会替用户刷新已上传的附件、用户级 Skill 安装副本，也不代表 MCP 已部署到该版本。
 
 ## 常见问题
 
@@ -320,7 +321,7 @@ git push
 
 ### 为什么刚合并的经验没有出现在文件里？
 
-先确认条目是 `status: active`，再确认维护者已经在最新 main 上运行 `npm run bundle` 并推送生成文件。
+先确认条目是 `status: active`，再确认最新 main 对应工作流的 `publish` 任务成功，知识包中能找到该条目 ID；如果发布失败，按上面的恢复步骤重跑。
 
 ### 每次都要上传最新版吗？
 

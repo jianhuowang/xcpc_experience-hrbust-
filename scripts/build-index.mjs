@@ -44,7 +44,7 @@ function groupSection(title, field) {
 const active = entries.filter((entry) => entry.status === "active").length;
 const output = `# 经验知识索引
 
-由 \`npm run build-index\` 生成，不手工编辑。维护者在合并后统一刷新索引和知识包。
+由 \`npm run build-index\` 生成，不手工编辑。合并到 main 并通过校验后，GitHub Actions 自动刷新索引和知识包。
 
 本索引包含 ${entries.length} 条知识：${active} 条 active、${entries.length - active} 条 deprecated。
 
