@@ -58,7 +58,7 @@
 - **协会经验**：经过 PR 审核的 active 条目，使用稳定条目 ID 引用。deprecated 条目保留历史，默认不用于回答，也不进入知识包。
 - **外部资料**：[wzj52501 资料库](sources/wzj52501/README.md)是独立参考层，保留固定来源、许可、页段定位和提取状态。收录不等于协会验证；公式、图表等可能仍有转录缺失，关键内容需核对原件。
 
-索引和知识包都是生成产物；新条目合并后需维护者重建，MCP 需部署新版本。查询以实际源文件或工具返回的版本为准，单独安装的 Skill 不自动携带根目录外部资料。
+索引和知识包都是生成产物；新条目合并到 main 并通过校验后由 GitHub Actions 自动更新，MCP 仍需部署新版本。查询以实际源文件或工具返回的版本为准，单独安装的 Skill 不自动携带根目录外部资料。
 
 ## 维护者与文档导航
 
@@ -83,4 +83,4 @@ npm run validate
 
 校验检查格式、重复稳定 ID、`related` 引用和确定性正文重复；技术正确性、语义增量和来源质量仍由 PR 审核。
 
-知识合并后，维护者执行 `npm run build-index` 和 `npm run bundle`，检查并提交生成差异；修改外部资料时另运行 `npm run validate:library`。详见[审核流程](docs/usage.md#如何审核-pull-request)和[生成产物更新](docs/usage.md#合并后如何更新索引与普通-chat-知识包)。
+知识合并后，Actions 自动重建并提交索引和知识包；维护者可在 Actions 的 **Validate knowledge** 工作流查看 `publish` 结果或手动重跑。投稿者无需执行生成命令。修改外部资料时另运行 `npm run validate:library`。详见[审核流程](docs/usage.md#如何审核-pull-request)和[生成产物更新](docs/usage.md#合并后如何更新索引与普通-chat-知识包)。

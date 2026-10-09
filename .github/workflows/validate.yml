@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,8 +22,28 @@ jobs:
       - run: npm run validate
       - run: npm run validate:library
       - run: npm run build-index
+      - run: npm run bundle
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install -r scripts/requirements-library.txt
       - run: python -m unittest discover -s tests -p 'test_import_library.py'
+
+  publish:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-knowledge-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run publish:knowledge

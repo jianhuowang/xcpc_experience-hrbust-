@@ -1,8 +1,8 @@
 # 经验知识索引
 
-由 `npm run build-index` 生成，不手工编辑。维护者在合并后统一刷新索引和知识包。
+由 `npm run build-index` 生成，不手工编辑。合并到 main 并通过校验后，GitHub Actions 自动刷新索引和知识包。
 
-本索引包含 5 条知识：2 条 active、3 条 deprecated。
+本索引包含 8 条知识：5 条 active、3 条 deprecated。
 
 索引仅用于导航；文件中的 active 标记不代表 PR 已审核。请以 main 和 PR 审核记录为准。
 deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏览时也须检查状态。
@@ -16,6 +16,9 @@ deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏
 |---|---|---|
 | [20260902-jianhuowang-abc221e-leq](knowledge/20260902-jianhuowang-abc221e-leq.md) | ABC221 E (LEQ)：贡献法迁移 + 树状数组入门 | active |
 | [20260902-jianhuowang-int128-requires-64bit](knowledge/20260902-jianhuowang-int128-requires-64bit.md) | 用 &#95;&#95;int128 前先确认评测环境是 64 位 | active |
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
 
 ### deprecated
 
@@ -32,6 +35,9 @@ deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏
 | 条目 ID | 标题 | 状态 |
 |---|---|---|
 | [20260902-example-member-shortest-path-checklist](knowledge/20260902-example-member-shortest-path-checklist.md) | 示例：最短路建模检查 | deprecated |
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
 
 ### contest
 
@@ -53,6 +59,24 @@ deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏
 | [20260902-jianhuowang-abc221e-leq](knowledge/20260902-jianhuowang-abc221e-leq.md) | ABC221 E (LEQ)：贡献法迁移 + 树状数组入门 | active |
 
 ## 按主题
+
+### amortized-analysis
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+
+### bfs
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
+
+### ceil-division
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
 
 ### contest
 
@@ -84,11 +108,18 @@ deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏
 |---|---|---|
 | [20260902-jianhuowang-abc221e-leq](knowledge/20260902-jianhuowang-abc221e-leq.md) | ABC221 E (LEQ)：贡献法迁移 + 树状数组入门 | active |
 
+### floor-division
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
+
 ### graph
 
 | 条目 ID | 标题 | 状态 |
 |---|---|---|
 | [20260902-example-member-shortest-path-checklist](knowledge/20260902-example-member-shortest-path-checklist.md) | 示例：最短路建模检查 | deprecated |
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
 
 ### integer
 
@@ -96,11 +127,48 @@ deprecated 仅保留历史，不作为默认经验推荐；按类型和主题浏
 |---|---|---|
 | [20260902-jianhuowang-int128-requires-64bit](knowledge/20260902-jianhuowang-int128-requires-64bit.md) | 用 &#95;&#95;int128 前先确认评测环境是 64 位 | active |
 
+### interval-counting
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
+
+### mex
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+
+### multiples
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [fixed-interval-multiple-counting](knowledge/fixed-interval-multiple-counting.md) | 定长区间中的倍数计数与整数除法陷阱 | active |
+
+### offline-query
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+
+### preprocessing
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [mex-query-bottleneck-and-threshold-split](knowledge/mex-query-bottleneck-and-threshold-split.md) | MEX 查询中的首缺口反推与参数阈值分治 | active |
+
 ### shortest-path
 
 | 条目 ID | 标题 | 状态 |
 |---|---|---|
 | [20260902-example-member-shortest-path-checklist](knowledge/20260902-example-member-shortest-path-checklist.md) | 示例：最短路建模检查 | deprecated |
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
+
+### state-expansion
+
+| 条目 ID | 标题 | 状态 |
+|---|---|---|
+| [state-expanded-shortest-path](knowledge/state-expanded-shortest-path.md) | 用有限附加状态扩展最短路节点 | active |
 
 ### subsequence
 
